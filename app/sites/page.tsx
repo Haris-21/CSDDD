@@ -14,6 +14,8 @@ type Site = {
   website: string
   employees: number
   type: string
+  postalcode : string
+  province : string
 }
 
  
@@ -26,6 +28,8 @@ export const sites: Site[] = [
     website: "https://sf.acmecorp.com",
     employees: 245,
     type: "Headquarters",
+    postalcode: "94105",
+    province : "California"
   },
   {
     id: 2,
@@ -35,6 +39,8 @@ export const sites: Site[] = [
     website: "https://austin.acmecorp.com",
     employees: 892,
     type: "Manufacturing",
+    postalcode: "78701",
+    province : "Texas"
   },
   {
     id: 3,
@@ -44,6 +50,8 @@ export const sites: Site[] = [
     website: "https://london.acmecorp.com",
     employees: 156,
     type: "Office",
+    postalcode: "34566",
+    province : "England"
   },
 ]
 

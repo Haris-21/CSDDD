@@ -14,6 +14,7 @@ import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { sites } from "../page";
+import { set } from "date-fns";
 
 
 export default function AddSitePage() {
@@ -26,22 +27,43 @@ export default function AddSitePage() {
   const [siteName, setSiteName] = useState("")
   const [siteWebsite, setSiteWebsite] = useState("")
   const [siteAddress, setSiteAddress] = useState("")
-const [siteCountry, setSiteCountry] = useState<string>("")
-  const [postalCode, setPostalCode] = useState("")
+  const [siteCountry, setSiteCountry] = useState<string>("")
+  const [postalCode, setPostalCode] = useState<string>("")
+  const [siteProvince, setProvince] = useState<string>("")
+
+
 
   useEffect(() => {
     if (siteToEdit) {
       setSiteName(siteToEdit.name)
       setSiteWebsite(siteToEdit.website || "")
       setSiteAddress(siteToEdit.address)
-      // setSiteCountry(siteToEdit.country)
-      setPostalCode("12345") // example: you may add this in sites data later
+      setPostalCode(siteToEdit.postalcode) 
+      setProvince(siteToEdit.province)
+
     }
 
     if (siteToEdit?.country) {
     setSiteCountry(siteToEdit.country) // pre-fill when editing
   }
   }, [siteToEdit])
+
+
+  const handleSave = () => {
+  const updatedSite = {
+    id: siteToEdit?.id || Date.now(), // new id if creating
+    name: siteName,
+    country: siteCountry,
+  }
+
+  if (siteToEdit) {
+    console.log("Updating site:", updatedSite)
+    // update site logic here
+  } else {
+    console.log("Saving new site:", updatedSite)
+    // save new site logic here
+  }
+}
 
   return (
     <div className="flex h-screen bg-background">
@@ -57,9 +79,9 @@ const [siteCountry, setSiteCountry] = useState<string>("")
                   Back to Sites
                 </Button>
               </Link>
-              <Button>
+              <Button onClick={handleSave}>
                 <Save className="h-4 w-4 mr-2" />
-                        {siteToEdit ? "Update Site" : "Save Site"}
+                {siteToEdit ? "Update Site" : "Save Site"}
               </Button>
             </div>
           </PageHeader>
@@ -109,36 +131,36 @@ const [siteCountry, setSiteCountry] = useState<string>("")
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="site-country">Country *</Label>
-                        <Select  onValueChange={setSiteCountry} >
+                        <Select value={siteCountry} onValueChange={setSiteCountry} >
                           <SelectTrigger className="border border-neutral-300">
-                            {/* <SelectValue className="text-black" placeholder="Select country" /> */}
-                            {siteCountry}
+                                <SelectValue placeholder="Select country" />     
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="us">United States</SelectItem>
-                            <SelectItem value="uk">United Kingdom</SelectItem>
-                            <SelectItem value="de">Germany</SelectItem>
-                            <SelectItem value="fr">France</SelectItem>
-                            <SelectItem value="ca">Canada</SelectItem>
-                            <SelectItem value="au">Australia</SelectItem>
-                            <SelectItem value="jp">Japan</SelectItem>
-                            <SelectItem value="in">India</SelectItem>
+                            <SelectItem value="United States">United States</SelectItem>
+                            <SelectItem value="United Kingdom">United Kingdom</SelectItem>
+                            <SelectItem value="Germany">Germany</SelectItem>
+                            <SelectItem value="France">France</SelectItem>
+                            <SelectItem value="Canada">Canada</SelectItem>
+                            <SelectItem value="Australia">Australia</SelectItem>
+                            <SelectItem value="Japan">Japan</SelectItem>
+                            <SelectItem value="India">India</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="site-state">State/Province *</Label>
-                        <Select>
+                        <Select value={siteProvince} onValueChange={setProvince}>
                           <SelectTrigger className="border border-neutral-300">
-                            <SelectValue placeholder="Select state" />
+                                <SelectValue placeholder="Select state" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="ca">California</SelectItem>
-                            <SelectItem value="ny">New York</SelectItem>
-                            <SelectItem value="tx">Texas</SelectItem>
-                            <SelectItem value="fl">Florida</SelectItem>
-                            <SelectItem value="il">Illinois</SelectItem>
+                            <SelectItem value="California">California</SelectItem>
+                            <SelectItem value="New York">New York</SelectItem>
+                            <SelectItem value="Texas">Texas</SelectItem>
+                            <SelectItem value="Florida">Florida</SelectItem>
+                            <SelectItem value="England">England</SelectItem>
+                            <SelectItem value="Illinois">Illinois</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

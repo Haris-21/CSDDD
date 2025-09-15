@@ -1,3 +1,4 @@
+"use client";
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,6 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { Upload, UserPlus, Download, Users, Search, Filter } from "lucide-react"
+import { useState } from "react";
+import { useEmployees } from "@/Context/EmployeeContext";
+import Link from "next/link";
+
 
 const employees = [
   {
@@ -44,6 +49,65 @@ const employees = [
 ]
 
 export default function EmployeesPage() {
+
+    const { employees, addEmployee } = useEmployees();
+
+  // Form state
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [middleName, setMiddleName] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [department, setDepartment] = useState("");
+  const [site, setSite] = useState("");
+  const [workerType, setWorkerType] = useState("");
+  const [employmentType, setEmploymentType] = useState("");
+  const [wage, setWage] = useState("");
+
+  const handleSaveEmployee = () => {
+    if (!firstName || !lastName) return alert("Name is required!");
+
+    addEmployee({
+      id: Date.now(),
+      name: `${firstName} ${middleName} ${lastName} `,
+      designation: designation || "Unknown",
+      department: department || "Unknown",
+      workerType: workerType || "Local",
+      employmentType: employmentType || "Permanent",
+      wage: wage || "N/A",
+      site: site || "Unknown",
+    });
+
+    // Reset form
+    setFirstName("");
+    setMiddleName("");
+    setLastName("");
+    setDesignation("");
+    setDepartment("");
+    setSite("");
+    setWorkerType("");
+    setEmploymentType("");
+    setWage("");
+  };
+
+  // --- add these states at the top of EmployeesPage ---
+const [searchTerm, setSearchTerm] = useState("");
+const [departmentFilter, setDepartmentFilter] = useState("all-departments");
+
+// --- filtered employees derived from employees state ---
+const filteredEmployees = employees.filter((emp) => {
+  const matchesSearch =
+    emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    emp.designation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    emp.department.toLowerCase().includes(searchTerm.toLowerCase());
+
+  const matchesDepartment =
+    departmentFilter === "all-departments" || emp.department.toLowerCase() === departmentFilter;
+
+  return matchesSearch && matchesDepartment;
+});
+
+
+
   return (
     <div className="flex h-screen bg-background">
       <SidebarNavigation />
@@ -59,7 +123,7 @@ export default function EmployeesPage() {
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button>
+              <Button onClick={handleSaveEmployee}>
                 <UserPlus className="h-4 w-4 mr-2" />
                 Add Employee
               </Button>
@@ -100,10 +164,13 @@ export default function EmployeesPage() {
                       <CardDescription>Add employees one by one using forms</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <Button className="w-full">
+                      {/* <Button value={"employee-form"} className="w-full">
                         <UserPlus className="h-4 w-4 mr-2" />
                         Add Employee
-                      </Button>
+                      </Button> */}
+                      <TabsList className="w-full">
+                          <TabsTrigger value="employee-form" className="w-full bg-primary text-primary-foreground"><UserPlus className="h-4 w-4 mr-2 " /> Add Employee</TabsTrigger>
+                      </TabsList>
                       <p className="text-xs text-muted-foreground mt-2 text-center">Recommended for small teams</p>
                     </CardContent>
                   </Card>
@@ -140,7 +207,7 @@ export default function EmployeesPage() {
                         <div className="space-y-2">
                           <Label htmlFor="title">Title</Label>
                           <Select>
-                            <SelectTrigger>
+                            <SelectTrigger className="border border-neutral-300 bg-white">
                               <SelectValue placeholder="Select" />
                             </SelectTrigger>
                             <SelectContent>
@@ -152,15 +219,21 @@ export default function EmployeesPage() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="first-name">First Name *</Label>
-                          <Input id="first-name" placeholder="Enter first name" />
+                          <Input id="first-name" placeholder="Enter first name" className="border border-neutral-300 bg-white" 
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}/>
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="middle-name">Middle Name</Label>
-                          <Input id="middle-name" placeholder="Enter middle name" />
+                          <Input id="middle-name" placeholder="Enter middle name" className="border border-neutral-300 bg-white"
+                          value={middleName}
+                          onChange={(e) => setMiddleName(e.target.value)} />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="last-name">Last Name *</Label>
-                          <Input id="last-name" placeholder="Enter last name" />
+                          <Input id="last-name" placeholder="Enter last name" className="border border-neutral-300 bg-white"
+                           value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}/>
                         </div>
                       </div>
 
@@ -168,7 +241,7 @@ export default function EmployeesPage() {
                         <div className="space-y-2">
                           <Label htmlFor="gender">Gender</Label>
                           <Select>
-                            <SelectTrigger>
+                            <SelectTrigger className="border border-neutral-300 bg-white">
                               <SelectValue placeholder="Select gender" />
                             </SelectTrigger>
                             <SelectContent>
@@ -180,12 +253,12 @@ export default function EmployeesPage() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="age">Age</Label>
-                          <Input id="age" type="number" placeholder="Enter age" />
+                          <Input id="age" type="number" placeholder="Enter age" className="border border-neutral-300 bg-white"/>
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="site">Site *</Label>
-                          <Select>
-                            <SelectTrigger>
+                          <Select onValueChange={(val) => setSite(val)}>
+                            <SelectTrigger className="border border-neutral-300 bg-white">
                               <SelectValue placeholder="Select site" />
                             </SelectTrigger>
                             <SelectContent>
@@ -204,8 +277,8 @@ export default function EmployeesPage() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="designation">Designation *</Label>
-                          <Select>
-                            <SelectTrigger>
+                          <Select  onValueChange={(val) => setDesignation(val)}>
+                            <SelectTrigger className="border border-neutral-300 bg-white">
                               <SelectValue placeholder="Select designation" />
                             </SelectTrigger>
                             <SelectContent>
@@ -218,8 +291,8 @@ export default function EmployeesPage() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="department">Department *</Label>
-                          <Select>
-                            <SelectTrigger>
+                          <Select onValueChange={(val) => setDepartment(val)}>
+                            <SelectTrigger className="border border-neutral-300 bg-white">
                               <SelectValue placeholder="Select department" />
                             </SelectTrigger>
                             <SelectContent>
@@ -232,7 +305,7 @@ export default function EmployeesPage() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="recruiting-agency">Recruiting Agency</Label>
-                          <Input id="recruiting-agency" placeholder="Enter agency name" />
+                          <Input id="recruiting-agency" placeholder="Enter agency name" className="border border-neutral-300 bg-white"/>
                         </div>
                       </div>
                     </div>
@@ -243,8 +316,8 @@ export default function EmployeesPage() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="wage-type">Wage Type *</Label>
-                          <Select>
-                            <SelectTrigger>
+                          <Select onValueChange={(val) => setWage(val)}>
+                            <SelectTrigger className="border border-neutral-300 bg-white">
                               <SelectValue placeholder="Select wage type" />
                             </SelectTrigger>
                             <SelectContent>
@@ -256,12 +329,12 @@ export default function EmployeesPage() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="compensation">Compensation Amount *</Label>
-                          <Input id="compensation" placeholder="Enter amount" />
+                          <Input id="compensation" placeholder="Enter amount" className="border border-neutral-300 bg-white"/>
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="reporting-to">Reporting To</Label>
                           <Select>
-                            <SelectTrigger>
+                            <SelectTrigger className="border border-neutral-300 bg-white">
                               <SelectValue placeholder="Select manager" />
                             </SelectTrigger>
                             <SelectContent>
@@ -293,8 +366,8 @@ export default function EmployeesPage() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="worker-type">Worker Type *</Label>
-                          <Select>
-                            <SelectTrigger>
+                          <Select onValueChange={(val) => setWorkerType(val)}>
+                            <SelectTrigger className="border border-neutral-300 bg-white">
                               <SelectValue placeholder="Select type" />
                             </SelectTrigger>
                             <SelectContent>
@@ -306,8 +379,8 @@ export default function EmployeesPage() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="employment-type">Employment Type *</Label>
-                          <Select>
-                            <SelectTrigger>
+                          <Select onValueChange={(val) => setEmploymentType(val)}>
+                            <SelectTrigger className="border border-neutral-300 bg-white">
                               <SelectValue placeholder="Select type" />
                             </SelectTrigger>
                             <SelectContent>
@@ -319,7 +392,7 @@ export default function EmployeesPage() {
                         <div className="space-y-2">
                           <Label htmlFor="work-mode">Mode of Work *</Label>
                           <Select>
-                            <SelectTrigger>
+                            <SelectTrigger className="border border-neutral-300 bg-white">
                               <SelectValue placeholder="Select mode" />
                             </SelectTrigger>
                             <SelectContent>
@@ -333,7 +406,7 @@ export default function EmployeesPage() {
                     </div>
 
                     <div className="flex justify-end pt-4">
-                      <Button>Save Employee</Button>
+                      <Button onClick={handleSaveEmployee}>Save Employee</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -347,11 +420,17 @@ export default function EmployeesPage() {
                       <div className="flex-1">
                         <div className="relative">
                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input placeholder="Search employees..." className="pl-10" />
+                          <Input placeholder="Search employees..." className="pl-10 border border-neutral-300 bg-white w-full" 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                          />
                         </div>
                       </div>
-                      <Select defaultValue="all-departments">
-                        <SelectTrigger className="w-48">
+                      <Select defaultValue="all-departments"
+                          value={departmentFilter}
+                          onValueChange={(val) => setDepartmentFilter(val)}
+                      >
+                        <SelectTrigger className="w-48 border border-neutral-300 bg-white">
                           <SelectValue placeholder="Department" />
                         </SelectTrigger>
                         <SelectContent>
@@ -361,10 +440,10 @@ export default function EmployeesPage() {
                           <SelectItem value="quality-assurance">Quality Assurance</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Button variant="outline">
+                      {/* <Button variant="outline">
                         <Filter className="h-4 w-4 mr-2" />
                         Filters
-                      </Button>
+                      </Button> */}
                     </div>
                   </CardContent>
                 </Card>
@@ -419,8 +498,8 @@ export default function EmployeesPage() {
 
                 {/* Employee List */}
                 <div className="space-y-4">
-                  {employees.map((employee) => (
-                    <Card key={employee.id}>
+                  {filteredEmployees.map((employee) => (
+                     <Card key={employee.id}>
                       <CardContent className="pt-6">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4">
@@ -458,14 +537,20 @@ export default function EmployeesPage() {
                               <p className="font-medium">{employee.site}</p>
                             </div>
                           </div>
-
-                          <Button variant="outline" size="sm">
-                            View Details
-                          </Button>
+                          <Link href={`/employees/${employee.id}`}>
+                            <Button variant="outline" size="sm">
+                              View Details
+                            </Button>
+                          </Link>
                         </div>
                       </CardContent>
                     </Card>
                   ))}
+
+                  {filteredEmployees.length === 0 && (
+                    <p className="text-sm text-muted-foreground">No employees found.</p>
+                  )}
+
                 </div>
               </TabsContent>
             </Tabs>

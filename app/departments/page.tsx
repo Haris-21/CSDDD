@@ -1,3 +1,4 @@
+"use client";
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,6 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Users, Shield, AlertTriangle, CheckCircle, Plus } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Progress } from "@/components/ui/progress";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const departments = [
   {
@@ -53,7 +57,58 @@ const complianceElements = [
   "Working Hours",
 ]
 
+const departmentAnalytics = [
+  {
+    department: "Engineering",
+    totalEmployees: 245,
+    maleEmployees: 180,
+    femaleEmployees: 65,
+    permanentEmployees: 220,
+    contractualEmployees: 25,
+    promotionGaps: 15,
+    hazardExposure: false,
+  },
+  {
+    department: "Manufacturing",
+    totalEmployees: 892,
+    maleEmployees: 534,
+    femaleEmployees: 358,
+    permanentEmployees: 670,
+    contractualEmployees: 222,
+    promotionGaps: 45,
+    hazardExposure: true,
+  },
+  {
+    department: "Quality Assurance",
+    totalEmployees: 156,
+    maleEmployees: 89,
+    femaleEmployees: 67,
+    permanentEmployees: 145,
+    contractualEmployees: 11,
+    promotionGaps: 8,
+    hazardExposure: false,
+  },
+]
+
 export default function DepartmentsPage() {
+   const router = useRouter()
+  const handleViewAnalytics = (departmentId: number) => {
+    router.push(`/departments/analytics/${departmentId}`)
+  }
+
+  const genderData = departmentAnalytics.map((dept) => ({
+    name: dept.department,
+    Male: dept.maleEmployees,
+    Female: dept.femaleEmployees,
+  }))
+
+  const workerTypeData = departmentAnalytics.map((dept) => ({
+    name: dept.department,
+    Permanent: dept.permanentEmployees,
+    Contractual: dept.contractualEmployees,
+  }))
+
+
   return (
     <div className="flex h-screen bg-background">
       <SidebarNavigation />
@@ -72,9 +127,10 @@ export default function DepartmentsPage() {
 
           <div className="mt-6">
             <Tabs defaultValue="department-list" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="department-list">Department Overview</TabsTrigger>
                 <TabsTrigger value="compliance-mapping">Compliance Mapping</TabsTrigger>
+                <TabsTrigger value="department-analytics">Department Analytics</TabsTrigger>
               </TabsList>
 
               <TabsContent value="department-list" className="space-y-6">
@@ -193,7 +249,7 @@ export default function DepartmentsPage() {
                             <Button variant="outline" size="sm">
                               Edit Mapping
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" onClick={() => handleViewAnalytics(department.id)}>
                               View Analytics
                             </Button>
                           </div>
@@ -283,6 +339,90 @@ export default function DepartmentsPage() {
                     </div>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+               <TabsContent value="department-analytics" className="space-y-6">
+                {/* Department Overview Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {departmentAnalytics.map((dept) => (
+                    <Card key={dept.department}>
+                      <CardHeader>
+                        <CardTitle className="flex items-center justify-between">
+                          {dept.department}
+                          {dept.hazardExposure && (
+                            <Badge variant="destructive" className="text-xs">
+                              Hazard Zone
+                            </Badge>
+                          )}
+                        </CardTitle>
+                        <CardDescription>{dept.totalEmployees} total employees</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span>Gender Balance</span>
+                            <span>{Math.round((dept.femaleEmployees / dept.totalEmployees) * 100)}% Female</span>
+                          </div>
+                          <Progress value={(dept.femaleEmployees / dept.totalEmployees) * 100} className="h-2" />
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span>Permanent Workers</span>
+                            <span>{Math.round((dept.permanentEmployees / dept.totalEmployees) * 100)}%</span>
+                          </div>
+                          <Progress value={(dept.permanentEmployees / dept.totalEmployees) * 100} className="h-2" />
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm">
+                          <span>Promotion Gaps (1+ years)</span>
+                          <Badge variant={dept.promotionGaps > 30 ? "destructive" : "secondary"}>
+                            {dept.promotionGaps}%
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Charts */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Gender Distribution by Department</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={genderData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" />
+                          <YAxis />
+                          <Tooltip />
+                          <Bar dataKey="Male" fill="#3b82f6" />
+                          <Bar dataKey="Female" fill="#ec4899" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Worker Classification</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={workerTypeData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" />
+                          <YAxis />
+                          <Tooltip />
+                          <Bar dataKey="Permanent" fill="#10b981" />
+                          <Bar dataKey="Contractual" fill="#f59e0b" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+                </div>
               </TabsContent>
             </Tabs>
           </div>

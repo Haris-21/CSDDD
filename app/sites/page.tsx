@@ -1,3 +1,4 @@
+"use client";
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -5,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Plus, MapPin, Globe, Users, Building, SquarePen, Eye } from "lucide-react"
 import Link from "next/link"
+import { useSites } from "@/Context/siteContext"
+import useContext from "react"
 
 type Site = {
   id: number
@@ -57,6 +60,11 @@ export const sites: Site[] = [
 
 
 export default function SitesPage() {
+
+    const { sites } = useSites();
+
+
+
   return (
     <div className="flex h-screen bg-background">
       <SidebarNavigation />
@@ -134,15 +142,17 @@ export default function SitesPage() {
 
                       <div className="flex gap-2 pt-2">
                         <Link href={`/sites/add?id=${site.id}`} className="flex-1">
-                          <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                          <Button variant="outline" size="sm" className="flex-1 w-full bg-transparent">
                             <SquarePen />
                             Edit Site
                           </Button>
                         </Link>
-                        <Button variant="outline" size="sm" className="flex-1 bg-transparent">
-                              <Eye />
-                          View Details
-                        </Button>
+                        <Link href={`/sites/${site.id}`} className="flex-1 w-full">
+                            <Button variant="outline" size="sm" className="flex-1 w-full bg-transparent">
+                                  <Eye />
+                              View Details
+                            </Button>
+                        </Link>
                       </div>
                     </CardContent>
                   </Card>

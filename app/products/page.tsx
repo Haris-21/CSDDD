@@ -1,3 +1,5 @@
+"use client";
+
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,7 +10,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Package, Factory, Truck, Search, Filter, Download, ExternalLink } from "lucide-react"
+import { Plus, Package, Factory, Truck, Search, Filter, Download, ExternalLink, Eye } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 const products = [
   {
@@ -78,6 +81,15 @@ const vendors = [
 ]
 
 export default function ProductsPage() {
+    const router = useRouter()
+
+  const handleViewChain = (productId: number) => {
+    router.push(`/products/chain/${productId}`)
+  }
+
+  const handleEditProduct = (productId: number) => {
+    router.push(`/products/edit/${productId}`)
+  }
   return (
     <div className="flex h-screen bg-background">
       <SidebarNavigation />
@@ -266,10 +278,11 @@ export default function ProductsPage() {
                           </div>
 
                           <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" onClick={() => handleEditProduct(product.id)}>
                               Edit Product
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" onClick={() => handleViewChain(product.id)}>
+                              <Eye className="h-4 w-4 mr-1" />
                               View Chain
                             </Button>
                           </div>

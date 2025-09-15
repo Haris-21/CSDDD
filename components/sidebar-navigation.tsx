@@ -19,28 +19,31 @@ import {
   BarChart3,
   ChevronLeft,
   ChevronRight,
+  LayoutDashboard,
+  Globe,
+  Scale,
 } from "lucide-react"
 
 const navigationItems = [
   {
     title: "Company Setup",
     items: [
-      // { name: "Company Dashboard", href: "/company/dashboard", icon: Building2 },
+      { name: "Company Dashboard", href: "/", icon:  LayoutDashboard  },
       { name: "Company Information", href: "/company/info", icon: Building2 },
     ],
   },
   {
     title: "Sites Management",
     items: [
-      { name: "Site Dashboard", href: "/sites", icon: MapPin },
+      { name: "Site Dashboard", href: "/sites", icon:  Globe  },
       { name: "Add Site", href: "/sites/add", icon: MapPin },
     ],
   },
   {
     title: "Organization",
     items: [
-      { name: "Policies", href: "/policies", icon: FileText },
       { name: "Employee Onboarding", href: "/employees", icon: Users },
+      { name: "Policies", href: "/policies", icon: Scale },
     ],
   },
   {

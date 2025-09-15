@@ -9,20 +9,22 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Save, ArrowLeft } from "lucide-react"
+import { Save, ArrowLeft, Router } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { sites } from "../page";
 import { set } from "date-fns";
+import { useSites } from "@/Context/siteContext";
+import { useRouter } from "next/navigation";
 
 
 export default function AddSitePage() {
-
+  const router = useRouter();           
   const searchParams = useSearchParams()
   const siteId = searchParams.get("id")
-  const siteToEdit =  (sites ?? []).find((site) => site.id === Number(siteId))
-
+  const { sites, addSite, updateSite } = useSites();
+  const siteToEdit =  sites.find((site) => site.id === Number(siteId))
   // state for form fields
   const [siteName, setSiteName] = useState("")
   const [siteWebsite, setSiteWebsite] = useState("")
@@ -49,21 +51,27 @@ export default function AddSitePage() {
   }, [siteToEdit])
 
 
-  const handleSave = () => {
-  const updatedSite = {
-    id: siteToEdit?.id || Date.now(), // new id if creating
-    name: siteName,
-    country: siteCountry,
-  }
+const handleSave = () => {
+    const updatedSite = {
+      id: siteToEdit?.id ?? Date.now(),
+      name: siteName,
+      country: siteCountry,
+      address: siteAddress,
+      website: siteWebsite,
+      employees: siteToEdit?.employees ?? 0,
+      type: siteToEdit?.type ?? "Office",
+      postalcode: postalCode,
+      province: siteProvince,
+    };
 
-  if (siteToEdit) {
-    console.log("Updating site:", updatedSite)
-    // update site logic here
-  } else {
-    console.log("Saving new site:", updatedSite)
-    // save new site logic here
-  }
-}
+    if (siteToEdit) {
+      updateSite(updatedSite);
+    } else {
+      addSite(updatedSite);
+    }
+
+    router.push("/sites");
+  };
 
   return (
     <div className="flex h-screen bg-background">
@@ -187,7 +195,7 @@ export default function AddSitePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="contact-name">Contact Person Name *</Label>
-                        <Input id="contact-name" placeholder="Enter full name" />
+                        <Input id="contact-name" placeholder="Enter full name" className="border border-neutral-300 bg-white"/>
                       </div>
 
                       <div className="space-y-2">
@@ -211,18 +219,18 @@ export default function AddSitePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="contact-email">Email Address *</Label>
-                        <Input id="contact-email" type="email" placeholder="contact@site.com" />
+                        <Input id="contact-email" type="email" placeholder="contact@site.com" className="border border-neutral-300 bg-white"/>
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="contact-alt-email">Alternative Email</Label>
-                        <Input id="contact-alt-email" type="email" placeholder="alternative@site.com" />
+                        <Input id="contact-alt-email" type="email" placeholder="alternative@site.com"  className="border border-neutral-300 bg-white"/>
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="contact-mobile">Mobile Number *</Label>
-                      <Input id="contact-mobile" type="tel" placeholder="+1 (555) 123-4567" />
+                      <Input id="contact-mobile" type="tel" placeholder="+1 (555) 123-4567" className="border border-neutral-300 bg-white"/>
                     </div>
 
                     <div className="flex justify-end pt-4">

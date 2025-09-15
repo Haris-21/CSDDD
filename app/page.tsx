@@ -2,7 +2,8 @@ import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Building2, Users, Shield, TrendingUp, Package, BarChart3 } from "lucide-react"
+import { Building2, Users, Shield, TrendingUp, Package, BarChart3} from "lucide-react"
+import Link from "next/link"
 
 export default function HomePage() {
   return (
@@ -95,7 +96,9 @@ export default function HomePage() {
                   <CardDescription>Register a new company location</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full">Get Started</Button>
+                   <Link href="/sites/add" className="w-full">
+                     <Button className="w-full text-base bg-primary text-primary-foreground">Get Started</Button>
+                  </Link>
                 </CardContent>
               </Card>
 
@@ -105,7 +108,9 @@ export default function HomePage() {
                   <CardDescription>Add new workforce members</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full">Add Employees</Button>
+                  <Link href="/employees" className="w-full">
+                     <Button className="w-full text-base bg-primary text-primary-foreground">Add Employees</Button>
+                  </Link>
                 </CardContent>
               </Card>
 
@@ -115,7 +120,9 @@ export default function HomePage() {
                   <CardDescription>Conduct compliance evaluation</CardDescription>
                 </CardHeader>
                 <CardContent>
+                  <Link href="/risk-assessment" className="w-full">
                   <Button className="w-full">Start Assessment</Button>
+                  </Link>
                 </CardContent>
               </Card>
 
@@ -125,7 +132,9 @@ export default function HomePage() {
                   <CardDescription>Create compliance documentation</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full">Create Report</Button>
+                  <Link href="/reports" className="w-full">
+                    <Button className="w-full">Create Report</Button>
+                  </Link>
                 </CardContent>
               </Card>
             </div>

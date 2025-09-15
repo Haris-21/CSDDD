@@ -8,12 +8,23 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Progress } from "@/components/ui/progress"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
-import { Users, Calendar, Plus } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+  ScatterChart,
+  Scatter,
+} from "recharts"
+import { Plus, Globe, AlertTriangle, Database, ExternalLink } from "lucide-react"
 import { useState } from "react"
 
 const departmentAnalytics = [
@@ -84,6 +95,52 @@ const COLORS = ["#ef4444", "#f59e0b", "#10b981"]
 
 export default function RiskAssessmentPage() {
   const [selectedDepartment, setSelectedDepartment] = useState("")
+  const [selectedCountry, setSelectedCountry] = useState("")
+  const [selectedSector, setSelectedSector] = useState("")
+  const [selectedRiskTopic, setSelectedRiskTopic] = useState("")
+  const [assessmentData, setAssessmentData] = useState({
+    peopleAffected: "",
+    areaImpacted: "",
+    removable: "",
+    mitigation: "",
+    severity: "",
+    probability: "",
+  })
+
+  const countryRiskData = [
+    {
+      country: "Bangladesh",
+      humanRights: 85,
+      environmental: 70,
+      sectoral: 75,
+      sources: ["ILO Reports 2024", "UN Global Compact", "World Bank ESG Data"],
+      lastUpdated: "2024-03-15",
+    },
+    {
+      country: "Vietnam",
+      humanRights: 60,
+      environmental: 55,
+      sectoral: 65,
+      sources: ["OECD Guidelines", "Vietnam Labor Watch", "Environmental Protection Agency"],
+      lastUpdated: "2024-03-10",
+    },
+    {
+      country: "India",
+      humanRights: 70,
+      environmental: 80,
+      sectoral: 60,
+      sources: ["Ministry of Labour Reports", "Central Pollution Control Board", "NITI Aayog"],
+      lastUpdated: "2024-03-12",
+    },
+    {
+      country: "China",
+      humanRights: 75,
+      environmental: 85,
+      sectoral: 70,
+      sources: ["Ministry of Ecology Reports", "China Labour Bulletin", "State Council Data"],
+      lastUpdated: "2024-03-08",
+    },
+  ]
 
   const genderData = departmentAnalytics.map((dept) => ({
     name: dept.department,
@@ -97,6 +154,87 @@ export default function RiskAssessmentPage() {
     Contractual: dept.contractualEmployees,
   }))
 
+  const riskTopics = [
+    {
+      id: "climate",
+      name: "Climate Change",
+      upstream: false,
+      manufacturing: true,
+      downstream: false,
+      description: "Greenhouse gas emissions and climate impact from operations",
+    },
+    {
+      id: "biodiversity",
+      name: "Biodiversity Loss",
+      upstream: true,
+      manufacturing: false,
+      downstream: false,
+      description: "Impact on ecosystems and wildlife habitats",
+    },
+    {
+      id: "water",
+      name: "Water Pollution",
+      upstream: true,
+      manufacturing: true,
+      downstream: false,
+      description: "Contamination of water sources from industrial processes",
+    },
+    {
+      id: "labor",
+      name: "Labor Rights",
+      upstream: false,
+      manufacturing: true,
+      downstream: false,
+      description: "Worker rights, fair wages, and working conditions",
+    },
+    {
+      id: "discrimination",
+      name: "Discrimination",
+      upstream: false,
+      manufacturing: true,
+      downstream: true,
+      description: "Workplace discrimination based on gender, race, or other factors",
+    },
+    {
+      id: "child-labor",
+      name: "Child Labor",
+      upstream: true,
+      manufacturing: true,
+      downstream: false,
+      description: "Employment of children below legal working age",
+    },
+    {
+      id: "forced-labor",
+      name: "Forced Labor",
+      upstream: true,
+      manufacturing: true,
+      downstream: false,
+      description: "Involuntary work or services under threat of penalty",
+    },
+    {
+      id: "safety",
+      name: "Workplace Safety",
+      upstream: false,
+      manufacturing: true,
+      downstream: false,
+      description: "Occupational health and safety standards",
+    },
+  ]
+
+  const riskSeverityData = [
+    { risk: "Child Labor", scale: 4, scope: 5, irremediability: 5, probability: 0.3, finalRisk: 4.2 },
+    { risk: "Water Pollution", scale: 3, scope: 4, irremediability: 2, probability: 0.7, finalRisk: 2.1 },
+    { risk: "Labor Rights", scale: 4, scope: 3, irremediability: 3, probability: 0.6, finalRisk: 2.0 },
+    { risk: "Discrimination", scale: 2, scope: 3, irremediability: 2, probability: 0.4, finalRisk: 0.9 },
+  ]
+
+  const heatmapData = riskSeverityData.map((risk) => ({
+    x: risk.finalRisk,
+    y: risk.probability * 100,
+    name: risk.risk,
+    severity: risk.finalRisk >= 3 ? "High" : risk.finalRisk >= 1.5 ? "Medium" : "Low",
+  }))
+
   return (
     <div className="flex h-screen bg-background">
       <SidebarNavigation />
@@ -105,7 +243,7 @@ export default function RiskAssessmentPage() {
         <div className="p-6">
           <PageHeader
             title="Risk Assessment & Analytics"
-            description="Analyze compliance risks and track remediation actions"
+            description="Comprehensive risk evaluation with country, sector, and topic-specific analysis"
           >
             <Button>
               <Plus className="h-4 w-4 mr-2" />
@@ -114,184 +252,465 @@ export default function RiskAssessmentPage() {
           </PageHeader>
 
           <div className="mt-6">
-            <Tabs defaultValue="department-analytics" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="department-analytics">Department Analytics</TabsTrigger>
-                <TabsTrigger value="risk-questionnaire">Risk Questionnaire</TabsTrigger>
+            <Tabs defaultValue="country-sector" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-5">
+                <TabsTrigger value="country-sector">Country & Sector</TabsTrigger>
+                <TabsTrigger value="risk-topics">Risk Topics</TabsTrigger>
+                <TabsTrigger value="severity-calc">Severity Calculation</TabsTrigger>
                 <TabsTrigger value="risk-heatmap">Risk Heatmap</TabsTrigger>
                 <TabsTrigger value="action-plans">Action Plans</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="department-analytics" className="space-y-6">
-                {/* Department Overview Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {departmentAnalytics.map((dept) => (
-                    <Card key={dept.department}>
-                      <CardHeader>
-                        <CardTitle className="flex items-center justify-between">
-                          {dept.department}
-                          {dept.hazardExposure && (
-                            <Badge variant="destructive" className="text-xs">
-                              Hazard Zone
-                            </Badge>
-                          )}
-                        </CardTitle>
-                        <CardDescription>{dept.totalEmployees} total employees</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span>Gender Balance</span>
-                            <span>{Math.round((dept.femaleEmployees / dept.totalEmployees) * 100)}% Female</span>
-                          </div>
-                          <Progress value={(dept.femaleEmployees / dept.totalEmployees) * 100} className="h-2" />
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span>Permanent Workers</span>
-                            <span>{Math.round((dept.permanentEmployees / dept.totalEmployees) * 100)}%</span>
-                          </div>
-                          <Progress value={(dept.permanentEmployees / dept.totalEmployees) * 100} className="h-2" />
-                        </div>
-
-                        <div className="flex items-center justify-between text-sm">
-                          <span>Promotion Gaps (1+ years)</span>
-                          <Badge variant={dept.promotionGaps > 30 ? "destructive" : "secondary"}>
-                            {dept.promotionGaps}%
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-
-                {/* Charts */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Gender Distribution by Department</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={genderData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" />
-                          <YAxis />
-                          <Tooltip />
-                          <Bar dataKey="Male" fill="#3b82f6" />
-                          <Bar dataKey="Female" fill="#ec4899" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Worker Classification</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={workerTypeData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" />
-                          <YAxis />
-                          <Tooltip />
-                          <Bar dataKey="Permanent" fill="#10b981" />
-                          <Bar dataKey="Contractual" fill="#f59e0b" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="risk-questionnaire" className="space-y-6">
+              <TabsContent value="country-sector" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Dynamic Risk Assessment</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      <Globe className="h-5 w-5" />
+                      Country & Sector Risk Overview
+                    </CardTitle>
                     <CardDescription>
-                      Answer questions based on your sector, location, and worker types to identify potential risks
+                      Select your region, country, and sector to view predefined risk exposure levels from verified data
+                      sources
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="sector">Select Sector *</Label>
+                        <Label htmlFor="region">Select Region *</Label>
                         <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Choose region" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="asia">Asia</SelectItem>
+                            <SelectItem value="europe">Europe</SelectItem>
+                            <SelectItem value="americas">Americas</SelectItem>
+                            <SelectItem value="africa">Africa</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="country">Select Country *</Label>
+                        <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Choose country" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="bangladesh">Bangladesh</SelectItem>
+                            <SelectItem value="vietnam">Vietnam</SelectItem>
+                            <SelectItem value="india">India</SelectItem>
+                            <SelectItem value="china">China</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="sector">Select Sector *</Label>
+                        <Select value={selectedSector} onValueChange={setSelectedSector}>
                           <SelectTrigger>
                             <SelectValue placeholder="Choose sector" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="textile">Textile</SelectItem>
+                            <SelectItem value="textile">Textile & Apparel</SelectItem>
                             <SelectItem value="automotive">Automotive</SelectItem>
                             <SelectItem value="electronics">Electronics</SelectItem>
                             <SelectItem value="agriculture">Agriculture</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="location">Select Location *</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose location" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="us">United States</SelectItem>
-                            <SelectItem value="bangladesh">Bangladesh</SelectItem>
-                            <SelectItem value="vietnam">Vietnam</SelectItem>
-                            <SelectItem value="mexico">Mexico</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="worker-type">Select Worker Type *</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose worker type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="migrant">Migrant Workers</SelectItem>
-                            <SelectItem value="local">Local Workers</SelectItem>
-                            <SelectItem value="seasonal">Seasonal Workers</SelectItem>
-                            <SelectItem value="contract">Contract Workers</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <Label>Predefined Risk Categories</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Select all risk categories that may apply to your operations
-                      </p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {[
-                          "Forced Labor",
-                          "Child Labor",
-                          "Discrimination",
-                          "Safety Violations",
-                          "Environmental Damage",
-                          "Wage Theft",
-                          "Excessive Working Hours",
-                          "Freedom of Association",
-                          "Gender-based Violence",
-                          "Occupational Health Risks",
-                        ].map((risk) => (
-                          <div key={risk} className="flex items-center space-x-3">
-                            <Checkbox id={risk} />
-                            <Label htmlFor={risk} className="text-sm font-normal">
-                              {risk}
-                            </Label>
-                          </div>
-                        ))}
+                    {selectedCountry && (
+                      <div className="space-y-6">
+                        <Card className="bg-blue-50 border-blue-200">
+                          <CardHeader>
+                            <CardTitle className="text-base flex items-center gap-2">
+                              <Database className="h-4 w-4" />
+                              Data Sources & Credibility
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-3">
+                              <div>
+                                <p className="text-sm font-medium">Risk data collected from verified sources:</p>
+                                <ul className="text-sm text-muted-foreground mt-1 space-y-1">
+                                  {countryRiskData
+                                    .find((c) => c.country.toLowerCase() === selectedCountry)
+                                    ?.sources.map((source, index) => (
+                                      <li key={index} className="flex items-center gap-2">
+                                        <ExternalLink className="h-3 w-3" />
+                                        {source}
+                                      </li>
+                                    ))}
+                                </ul>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Last updated:{" "}
+                                {countryRiskData.find((c) => c.country.toLowerCase() === selectedCountry)?.lastUpdated}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          <Card>
+                            <CardHeader>
+                              <CardTitle className="text-base">Risk Exposure by Country</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <ResponsiveContainer width="100%" height={300}>
+                                <BarChart
+                                  data={countryRiskData.filter((c) => c.country.toLowerCase() === selectedCountry)}
+                                >
+                                  <CartesianGrid strokeDasharray="3 3" />
+                                  <XAxis dataKey="country" />
+                                  <YAxis />
+                                  <Tooltip />
+                                  <Bar dataKey="humanRights" fill="#ef4444" name="Human Rights" />
+                                  <Bar dataKey="environmental" fill="#10b981" name="Environmental" />
+                                  <Bar dataKey="sectoral" fill="#3b82f6" name="Sectoral" />
+                                </BarChart>
+                              </ResponsiveContainer>
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardHeader>
+                              <CardTitle className="text-base">Country-Specific Risk Analysis</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-4">
+                                {selectedCountry === "bangladesh" && (
+                                  <>
+                                    <div className="p-3 border rounded bg-red-50">
+                                      <h5 className="font-medium text-red-800">High Risk Areas</h5>
+                                      <ul className="text-sm text-red-700 mt-1 space-y-1">
+                                        <li>• Labor rights violations in textile sector</li>
+                                        <li>• Building safety standards</li>
+                                        <li>• Child labor in supply chains</li>
+                                      </ul>
+                                    </div>
+                                    <div className="p-3 border rounded bg-yellow-50">
+                                      <h5 className="font-medium text-yellow-800">Medium Risk Areas</h5>
+                                      <ul className="text-sm text-yellow-700 mt-1 space-y-1">
+                                        <li>• Water pollution from dyeing</li>
+                                        <li>• Workplace discrimination</li>
+                                      </ul>
+                                    </div>
+                                  </>
+                                )}
+                                {selectedCountry === "vietnam" && (
+                                  <>
+                                    <div className="p-3 border rounded bg-yellow-50">
+                                      <h5 className="font-medium text-yellow-800">Medium Risk Areas</h5>
+                                      <ul className="text-sm text-yellow-700 mt-1 space-y-1">
+                                        <li>• Working hours compliance</li>
+                                        <li>• Environmental regulations</li>
+                                        <li>• Freedom of association</li>
+                                      </ul>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        <Card>
+                          <CardHeader>
+                            <CardTitle>Risk Analysis Summary</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="text-center p-4 border rounded">
+                                <div className="text-2xl font-bold text-red-600">85</div>
+                                <div className="text-sm text-muted-foreground">Human Rights Risk</div>
+                              </div>
+                              <div className="text-center p-4 border rounded">
+                                <div className="text-2xl font-bold text-green-600">70</div>
+                                <div className="text-sm text-muted-foreground">Environmental Risk</div>
+                              </div>
+                              <div className="text-center p-4 border rounded">
+                                <div className="text-2xl font-bold text-blue-600">75</div>
+                                <div className="text-sm text-muted-foreground">Sectoral Risk</div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
                       </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="risk-topics" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Risk Topic Assessment</CardTitle>
+                    <CardDescription>
+                      Select risk topics and complete detailed assessment with criteria evaluation
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                      <Label>Select Risk Topic for Assessment</Label>
+                      <Select value={selectedRiskTopic} onValueChange={setSelectedRiskTopic}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choose a risk topic to assess" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {riskTopics.map((topic) => (
+                            <SelectItem key={topic.id} value={topic.id}>
+                              {topic.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {selectedRiskTopic && (
+                      <Card className="border-dashed">
+                        <CardHeader>
+                          <CardTitle className="text-base">
+                            {riskTopics.find((t) => t.id === selectedRiskTopic)?.name} Assessment
+                          </CardTitle>
+                          <CardDescription>
+                            {riskTopics.find((t) => t.id === selectedRiskTopic)?.description}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                              <Label htmlFor="people-affected">How many people are affected?</Label>
+                              <Input
+                                id="people-affected"
+                                placeholder="e.g., 5, 10, 100"
+                                value={assessmentData.peopleAffected}
+                                onChange={(e) =>
+                                  setAssessmentData({ ...assessmentData, peopleAffected: e.target.value })
+                                }
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label htmlFor="area-impact">How much area is impacted?</Label>
+                              <Input
+                                id="area-impact"
+                                placeholder="e.g., local, regional, national"
+                                value={assessmentData.areaImpacted}
+                                onChange={(e) => setAssessmentData({ ...assessmentData, areaImpacted: e.target.value })}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="removable">Is it possible to remove and maintain?</Label>
+                            <Textarea
+                              id="removable"
+                              placeholder="Describe the feasibility of removing this risk and maintaining operations"
+                              value={assessmentData.removable}
+                              onChange={(e) => setAssessmentData({ ...assessmentData, removable: e.target.value })}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="mitigation">How will it be mitigated?</Label>
+                            <Textarea
+                              id="mitigation"
+                              placeholder="Describe specific mitigation strategies and action plans"
+                              value={assessmentData.mitigation}
+                              onChange={(e) => setAssessmentData({ ...assessmentData, mitigation: e.target.value })}
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                              <Label htmlFor="severity">Severity Level</Label>
+                              <Select
+                                value={assessmentData.severity}
+                                onValueChange={(value) => setAssessmentData({ ...assessmentData, severity: value })}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select severity" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="low">Low</SelectItem>
+                                  <SelectItem value="medium">Medium</SelectItem>
+                                  <SelectItem value="high">High</SelectItem>
+                                  <SelectItem value="critical">Critical</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label htmlFor="probability">Probability of Occurrence</Label>
+                              <Select
+                                value={assessmentData.probability}
+                                onValueChange={(value) => setAssessmentData({ ...assessmentData, probability: value })}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select probability" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="low">Low</SelectItem>
+                                  <SelectItem value="medium">Medium</SelectItem>
+                                  <SelectItem value="high">High</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-end pt-4">
+                            <Button>Save Assessment</Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-4 gap-4 text-sm font-medium text-center">
+                        <div>Risk Topic</div>
+                        <div>Upstream</div>
+                        <div>Manufacturing</div>
+                        <div>Downstream</div>
+                      </div>
+
+                      {riskTopics.map((topic) => (
+                        <div key={topic.id} className="grid grid-cols-4 gap-4 items-center p-3 border rounded">
+                          <div className="font-medium">{topic.name}</div>
+                          <div className="text-center">
+                            <Checkbox id={`${topic.id}-upstream`} defaultChecked={topic.upstream} />
+                          </div>
+                          <div className="text-center">
+                            <Checkbox id={`${topic.id}-manufacturing`} defaultChecked={topic.manufacturing} />
+                          </div>
+                          <div className="text-center">
+                            <Checkbox id={`${topic.id}-downstream`} defaultChecked={topic.downstream} />
+                          </div>
+                        </div>
+                      ))}
                     </div>
 
                     <div className="flex justify-end pt-4">
-                      <Button>Generate Risk Assessment</Button>
+                      <Button>Save Risk Topic Selection</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="severity-calc" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Risk Severity Calculation</CardTitle>
+                    <CardDescription>
+                      Evaluate each selected risk by Scale, Scope, and Irremediability with probability multiplier
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-6">
+                      {riskSeverityData.map((risk, index) => (
+                        <div key={index} className="p-4 border rounded-lg space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold">{risk.risk}</h4>
+                            <Badge
+                              variant={
+                                risk.finalRisk >= 3 ? "destructive" : risk.finalRisk >= 1.5 ? "secondary" : "default"
+                              }
+                              className={
+                                risk.finalRisk >= 3
+                                  ? "bg-red-100 text-red-800"
+                                  : risk.finalRisk >= 1.5
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-green-100 text-green-800"
+                              }
+                            >
+                              {risk.finalRisk >= 3 ? "High" : risk.finalRisk >= 1.5 ? "Medium" : "Low"}
+                            </Badge>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div className="space-y-2">
+                              <Label>Scale (People Affected)</Label>
+                              <Select defaultValue={risk.scale.toString()}>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="1">1 - Very Few</SelectItem>
+                                  <SelectItem value="2">2 - Few</SelectItem>
+                                  <SelectItem value="3">3 - Some</SelectItem>
+                                  <SelectItem value="4">4 - Many</SelectItem>
+                                  <SelectItem value="5">5 - Very Many</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Scope (Impact Area)</Label>
+                              <Select defaultValue={risk.scope.toString()}>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="1">1 - Very Limited</SelectItem>
+                                  <SelectItem value="2">2 - Limited</SelectItem>
+                                  <SelectItem value="3">3 - Moderate</SelectItem>
+                                  <SelectItem value="4">4 - Widespread</SelectItem>
+                                  <SelectItem value="5">5 - Very Widespread</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Irremediability</Label>
+                              <Select defaultValue={risk.irremediability.toString()}>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="1">1 - Easily Reversible</SelectItem>
+                                  <SelectItem value="2">2 - Reversible</SelectItem>
+                                  <SelectItem value="3">3 - Partially Reversible</SelectItem>
+                                  <SelectItem value="4">4 - Difficult to Reverse</SelectItem>
+                                  <SelectItem value="5">5 - Irreversible</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Probability</Label>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="1"
+                                step="0.1"
+                                defaultValue={risk.probability}
+                                placeholder="0.0 - 1.0"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="bg-muted/50 p-3 rounded">
+                            <div className="text-sm space-y-1">
+                              <div>
+                                Risk Score = (Scale + Scope + Irremediability) / 3 = ({risk.scale} + {risk.scope} +{" "}
+                                {risk.irremediability}) / 3 ={" "}
+                                {((risk.scale + risk.scope + risk.irremediability) / 3).toFixed(1)}
+                              </div>
+                              <div>
+                                Final Risk = Risk Score × Probability ={" "}
+                                {((risk.scale + risk.scope + risk.irremediability) / 3).toFixed(1)} × {risk.probability}{" "}
+                                = <strong>{risk.finalRisk.toFixed(1)}</strong>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex justify-end pt-4">
+                      <Button>Recalculate Risk Scores</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -300,87 +719,97 @@ export default function RiskAssessmentPage() {
               <TabsContent value="risk-heatmap" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Risk Heatmap Visualization</CardTitle>
-                    <CardDescription>Visual representation of risk levels across departments and sites</CardDescription>
+                    <CardTitle>Risk Heatmap & Priority Ranking</CardTitle>
+                    <CardDescription>
+                      Visual representation of risks plotted by severity and probability
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <h4 className="font-semibold">Risk Levels by Department</h4>
+                      <div>
+                        <h4 className="font-semibold mb-4">Risk Heatmap</h4>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <ScatterChart>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis
+                              type="number"
+                              dataKey="x"
+                              name="Severity"
+                              domain={[0, 5]}
+                              label={{ value: "Severity", position: "insideBottom", offset: -5 }}
+                            />
+                            <YAxis
+                              type="number"
+                              dataKey="y"
+                              name="Probability"
+                              domain={[0, 100]}
+                              label={{ value: "Probability (%)", angle: -90, position: "insideLeft" }}
+                            />
+                            <Tooltip
+                              cursor={{ strokeDasharray: "3 3" }}
+                              formatter={(value, name) => [
+                                name === "x" ? `${value}` : `${value}%`,
+                                name === "x" ? "Severity" : "Probability",
+                              ]}
+                              labelFormatter={(label, payload) => payload?.[0]?.payload?.name || ""}
+                            />
+                            <Scatter data={heatmapData} fill="#8884d8">
+                              {heatmapData.map((entry, index) => (
+                                <Cell
+                                  key={`cell-${index}`}
+                                  fill={
+                                    entry.severity === "High"
+                                      ? "#ef4444"
+                                      : entry.severity === "Medium"
+                                        ? "#f59e0b"
+                                        : "#10b981"
+                                  }
+                                />
+                              ))}
+                            </Scatter>
+                          </ScatterChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      <div>
+                        <h4 className="font-semibold mb-4">Priority Ranking</h4>
                         <div className="space-y-3">
-                          {riskHeatmapData.map((item) => (
-                            <div key={item.department} className="flex items-center justify-between p-3 border rounded">
-                              <span className="font-medium">{item.department}</span>
-                              <div className="flex items-center gap-3">
-                                <div className="w-24">
-                                  <Progress
-                                    value={item.riskScore}
-                                    className={`h-2 ${
-                                      item.riskScore >= 70
-                                        ? "[&>div]:bg-red-500"
-                                        : item.riskScore >= 40
-                                          ? "[&>div]:bg-yellow-500"
-                                          : "[&>div]:bg-green-500"
-                                    }`}
-                                  />
+                          {riskSeverityData
+                            .sort((a, b) => b.finalRisk - a.finalRisk)
+                            .map((risk, index) => (
+                              <div key={index} className="flex items-center justify-between p-3 border rounded">
+                                <div className="flex items-center gap-3">
+                                  <div className="text-sm font-medium">#{index + 1}</div>
+                                  <div>
+                                    <div className="font-medium">{risk.risk}</div>
+                                    <div className="text-sm text-muted-foreground">
+                                      Score: {risk.finalRisk.toFixed(1)} | Probability:{" "}
+                                      {(risk.probability * 100).toFixed(0)}%
+                                    </div>
+                                  </div>
                                 </div>
                                 <Badge
                                   variant={
-                                    item.level === "High"
+                                    risk.finalRisk >= 3
                                       ? "destructive"
-                                      : item.level === "Medium"
+                                      : risk.finalRisk >= 1.5
                                         ? "secondary"
                                         : "default"
                                   }
                                   className={
-                                    item.level === "High"
+                                    risk.finalRisk >= 3
                                       ? "bg-red-100 text-red-800"
-                                      : item.level === "Medium"
+                                      : risk.finalRisk >= 1.5
                                         ? "bg-yellow-100 text-yellow-800"
                                         : "bg-green-100 text-green-800"
                                   }
                                 >
-                                  {item.level}
+                                  {risk.finalRisk >= 3 ? "High" : risk.finalRisk >= 1.5 ? "Medium" : "Low"}
                                 </Badge>
                               </div>
-                            </div>
-                          ))}
+                            ))}
                         </div>
                       </div>
-
-                      <div className="space-y-4">
-                        <h4 className="font-semibold">Risk Distribution</h4>
-                        <ResponsiveContainer width="100%" height={250}>
-                          <PieChart>
-                            <Pie
-                              data={[
-                                { name: "High Risk", value: riskHeatmapData.filter((d) => d.level === "High").length },
-                                {
-                                  name: "Medium Risk",
-                                  value: riskHeatmapData.filter((d) => d.level === "Medium").length,
-                                },
-                                { name: "Low Risk", value: riskHeatmapData.filter((d) => d.level === "Low").length },
-                              ]}
-                              cx="50%"
-                              cy="50%"
-                              outerRadius={80}
-                              dataKey="value"
-                              label
-                            >
-                              {COLORS.map((color, index) => (
-                                <Cell key={`cell-${index}`} fill={color} />
-                              ))}
-                            </Pie>
-                            <Tooltip />
-                          </PieChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-
-                    <div className="mt-6 flex gap-2">
-                      <Button variant="outline">Filter by Site</Button>
-                      <Button variant="outline">Filter by Department</Button>
-                      <Button variant="outline">Export Heatmap</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -389,138 +818,153 @@ export default function RiskAssessmentPage() {
               <TabsContent value="action-plans" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Risk Action Plans</CardTitle>
-                    <CardDescription>Track and manage remediation actions for identified risks</CardDescription>
+                    <CardTitle>Action Plan & Remediation Tracker</CardTitle>
+                    <CardDescription>
+                      Auto-suggested mitigation actions with assignment and progress tracking
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-6">
                     <div className="space-y-4">
-                      {actionPlans.map((plan) => (
-                        <div key={plan.id} className="p-4 border rounded-lg space-y-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
-                                <Badge variant="outline">{plan.riskId}</Badge>
-                                <Badge
-                                  variant={plan.severity === "High" ? "destructive" : "secondary"}
-                                  className={
-                                    plan.severity === "High"
-                                      ? "bg-red-100 text-red-800"
-                                      : "bg-yellow-100 text-yellow-800"
-                                  }
-                                >
-                                  {plan.severity} Severity
-                                </Badge>
-                                <Badge
-                                  variant={plan.status === "In Progress" ? "default" : "secondary"}
-                                  className={
-                                    plan.status === "In Progress"
-                                      ? "bg-blue-100 text-blue-800"
-                                      : "bg-gray-100 text-gray-800"
-                                  }
-                                >
-                                  {plan.status}
-                                </Badge>
-                              </div>
-                              <h4 className="font-semibold mb-1">{plan.description}</h4>
-                              <p className="text-sm text-muted-foreground mb-2">{plan.recommendedAction}</p>
-                              <div className="flex items-center gap-4 text-sm">
-                                <div className="flex items-center gap-1">
-                                  <Users className="h-4 w-4 text-muted-foreground" />
-                                  <span>Assigned to: {plan.assignedTo}</span>
+                      {riskSeverityData
+                        .filter((risk) => risk.finalRisk >= 1.5)
+                        .map((risk, index) => (
+                          <div key={index} className="p-4 border rounded-lg space-y-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <AlertTriangle className="h-5 w-5 text-orange-600" />
+                                <div>
+                                  <h4 className="font-semibold">{risk.risk}</h4>
+                                  <p className="text-sm text-muted-foreground">
+                                    Risk Score: {risk.finalRisk.toFixed(1)} | Priority: {index + 1}
+                                  </p>
                                 </div>
-                                <div className="flex items-center gap-1">
-                                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                                  <span>Due: {plan.deadline}</span>
+                              </div>
+                              <Badge
+                                variant={risk.finalRisk >= 3 ? "destructive" : "secondary"}
+                                className={
+                                  risk.finalRisk >= 3 ? "bg-red-100 text-red-800" : "bg-yellow-100 text-yellow-800"
+                                }
+                              >
+                                {risk.finalRisk >= 3 ? "High" : "Medium"} Priority
+                              </Badge>
+                            </div>
+
+                            <div className="space-y-3">
+                              <div>
+                                <Label className="text-sm font-medium">Auto-Suggested Actions</Label>
+                                <div className="mt-2 space-y-2">
+                                  {risk.risk === "Child Labor" && (
+                                    <>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <Checkbox id={`action-${index}-1`} />
+                                        <label htmlFor={`action-${index}-1`}>Implement age verification system</label>
+                                      </div>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <Checkbox id={`action-${index}-2`} />
+                                        <label htmlFor={`action-${index}-2`}>Conduct supplier audits</label>
+                                      </div>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <Checkbox id={`action-${index}-3`} />
+                                        <label htmlFor={`action-${index}-3`}>Establish grievance mechanism</label>
+                                      </div>
+                                    </>
+                                  )}
+                                  {risk.risk === "Water Pollution" && (
+                                    <>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <Checkbox id={`action-${index}-1`} />
+                                        <label htmlFor={`action-${index}-1`}>Install water treatment systems</label>
+                                      </div>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <Checkbox id={`action-${index}-2`} />
+                                        <label htmlFor={`action-${index}-2`}>Monitor water quality regularly</label>
+                                      </div>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <Checkbox id={`action-${index}-3`} />
+                                        <label htmlFor={`action-${index}-3`}>Obtain environmental certifications</label>
+                                      </div>
+                                    </>
+                                  )}
+                                  {risk.risk === "Labor Rights" && (
+                                    <>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <Checkbox id={`action-${index}-1`} />
+                                        <label htmlFor={`action-${index}-1`}>Conduct labor rights training</label>
+                                      </div>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <Checkbox id={`action-${index}-2`} />
+                                        <label htmlFor={`action-${index}-2`}>Establish worker committees</label>
+                                      </div>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <Checkbox id={`action-${index}-3`} />
+                                        <label htmlFor={`action-${index}-3`}>Regular compliance audits</label>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="space-y-2">
+                                  <Label>Assign To</Label>
+                                  <Select>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select assignee" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="compliance">Compliance Officer</SelectItem>
+                                      <SelectItem value="operations">Operations Manager</SelectItem>
+                                      <SelectItem value="procurement">Procurement Manager</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label>Due Date</Label>
+                                  <Input type="date" />
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label>Status</Label>
+                                  <Select defaultValue="pending">
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="pending">Pending</SelectItem>
+                                      <SelectItem value="in-progress">In Progress</SelectItem>
+                                      <SelectItem value="completed">Completed</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label>Progress</Label>
+                                <div className="flex items-center gap-3">
+                                  <Progress value={25} className="flex-1" />
+                                  <span className="text-sm text-muted-foreground">25%</span>
+                                </div>
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label>Evidence Upload</Label>
+                                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center">
+                                  <p className="text-sm text-muted-foreground">
+                                    Drag and drop files here or click to upload evidence
+                                  </p>
+                                  <Button variant="outline" size="sm" className="mt-2 bg-transparent">
+                                    Choose Files
+                                  </Button>
                                 </div>
                               </div>
                             </div>
-                            <Button variant="outline" size="sm">
-                              Update Status
-                            </Button>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="mt-6">
-                      <Button>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Create New Action Plan
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Add New Action Plan Form */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Create Action Plan</CardTitle>
-                    <CardDescription>Define remediation actions for identified risks</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="risk-severity">Risk Severity *</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select severity" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="high">High</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="low">Low</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="assigned-to">Assigned To *</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select assignee" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="hr-manager">HR Manager</SelectItem>
-                            <SelectItem value="operations-manager">Operations Manager</SelectItem>
-                            <SelectItem value="compliance-officer">Compliance Officer</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="risk-description">Risk Description *</Label>
-                      <Textarea id="risk-description" placeholder="Describe the identified risk..." />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="recommended-action">Recommended Action *</Label>
-                      <Textarea id="recommended-action" placeholder="Describe the recommended remediation action..." />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="deadline">Deadline *</Label>
-                        <Input id="deadline" type="date" />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="status">Status *</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="open">Open</SelectItem>
-                            <SelectItem value="in-progress">In Progress</SelectItem>
-                            <SelectItem value="closed">Closed</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                        ))}
                     </div>
 
                     <div className="flex justify-end pt-4">
-                      <Button>Create Action Plan</Button>
+                      <Button>Save Action Plans</Button>
                     </div>
                   </CardContent>
                 </Card>

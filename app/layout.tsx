@@ -5,6 +5,8 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
+import { SitesProvider } from "@/Context/siteContext"
+import { EmployeesProvider } from "@/Context/EmployeeContext"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -26,7 +28,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans ${poppins.variable} ${GeistMono.variable}`}>
-        <Suspense fallback={null}>{children}</Suspense>
+           <Suspense fallback={null}>
+            <SitesProvider>
+                <EmployeesProvider>
+                  {children}
+                </EmployeesProvider>
+            </SitesProvider>
+            </Suspense>
         <Analytics />
       </body>
     </html>

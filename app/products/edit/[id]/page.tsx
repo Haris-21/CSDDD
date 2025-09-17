@@ -11,42 +11,42 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Save, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useProducts } from "@/Context/productContext"
 
 export default function EditProductPage({ params }: { params: { id: string } }) {
   const router = useRouter()
 
-  // Mock product data - in real app, fetch based on params.id
-  const [product, setProduct] = useState({
-    id: params.id,
-    name: "Premium Cotton T-Shirt",
-    productId: "PROD-001",
-    articleId: "ART-TSH-001",
-    sku: "TSH-COTTON-001",
-    source: "In-house",
-    description: "High-quality organic cotton t-shirt with sustainable production methods",
-    processes: ["Cutting", "Stitching", "Quality Check"],
-    materials: ["Organic Cotton", "Polyester Thread"],
-    riskLevel: "Low",
-    vendor: "",
-    vendorCountry: "",
-    productionSite: "austin-plant",
-  })
+  const { products, updateProduct, deleteProduct } = useProducts();
+
+
+
+   // find product from context
+  const existingProduct = products.find((p) => p.id === Number(params.id));
+
+  const [product, setProduct] = useState(existingProduct);
+
+  // in case products are loaded async
+  useEffect(() => {
+    if (existingProduct) setProduct(existingProduct);
+  }, [existingProduct]);
+
+  if (!product) {
+    return <div className="p-6">❌ Product not found</div>;
+  }
 
   const handleSave = () => {
-    // Save logic here
-    console.log("Saving product:", product)
-    alert("Product updated successfully!")
-    router.push("/products")
-  }
+    updateProduct(product); // ✅ update in context
+    alert("Product updated successfully!");
+    router.push("/products");
+  };
 
   const handleDelete = () => {
     if (confirm("Are you sure you want to delete this product?")) {
-      // Delete logic here
-      console.log("Deleting product:", product.id)
-      router.push("/products")
+      deleteProduct(product.id); // ✅ delete from context
+      router.push("/products");
     }
-  }
+  };
 
   return (
     <div className="flex h-screen bg-background">
@@ -120,8 +120,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
-                    value={product.description}
-                    onChange={(e) => setProduct({ ...product, description: e.target.value })}
+                    // value={product.description}
+                    // onChange={(e) => setProduct({ ...product, description: e.target.value })}
                     rows={3}
                   />
                 </div>
@@ -198,8 +198,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                   <div className="space-y-2">
                     <Label htmlFor="production-site">Production Site</Label>
                     <Select
-                      value={product.productionSite}
-                      onValueChange={(value) => setProduct({ ...product, productionSite: value })}
+                      // value={product.productionSite}
+                      // onValueChange={(value) => setProduct({ ...product, productionSite: value })}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select production site" />

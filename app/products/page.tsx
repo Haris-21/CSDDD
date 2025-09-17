@@ -11,7 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Package, Factory, Truck, Search, Filter, Download, ExternalLink, Eye } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useVendors } from "@/Context/vendorContext";
+import { useChain } from "@/Context/chainContext";
+import { useProducts } from "@/Context/productContext";
+import { useEffect, useState } from "react";
 
 const products = [
   {
@@ -81,14 +85,94 @@ const vendors = [
 ]
 
 export default function ProductsPage() {
-    const router = useRouter()
+  
 
-  const handleViewChain = (productId: number) => {
-    router.push(`/products/chain/${productId}`)
-  }
 
-  const handleEditProduct = (productId: number) => {
-    router.push(`/products/edit/${productId}`)
+  const { vendors, addVendor, updateVendor, deleteVendor } = useVendors();
+  const { supplyChainStages, materials } = useChain();
+
+
+    const router = useRouter();
+  const searchParams = useSearchParams();
+  const productId = searchParams.get("id");
+
+  const { products, addProduct, updateProduct, editProduct, viewChain } = useProducts();
+  const productToEdit = products.find((p) => p.id === Number(productId));
+
+  // state for form fields
+  const [name, setName] = useState("");
+  const [productCode, setProductCode] = useState("");
+  const [articleId, setArticleId] = useState("");
+  const [sku, setSku] = useState("");
+  const [source, setSource] = useState<string>("");
+  const [vendor, setVendor] = useState("");
+  const [vendorCountry, setVendorCountry] = useState("");
+  const [riskLevel, setRiskLevel] = useState("");
+
+  useEffect(() => {
+    if (productToEdit) {
+      setName(productToEdit.name);
+      setProductCode(productToEdit.productId);
+      setArticleId(productToEdit.articleId);
+      setSku(productToEdit.sku);
+      setSource(productToEdit.source);
+      setVendor(productToEdit.vendor || "");
+      setVendorCountry(productToEdit.vendorCountry || "");
+      setRiskLevel(productToEdit.riskLevel || "");
+    }
+  }, [productToEdit]);
+
+  const handleSave = () => {
+    const updatedProduct = {
+      id: productToEdit?.id ?? Date.now(),
+      name,
+      productId: productCode,
+      articleId,
+      sku,
+      source,
+      vendor,
+      vendorCountry,
+      riskLevel,
+      processes: productToEdit?.processes ?? [],
+      materials: productToEdit?.materials ?? [],
+    };
+
+    if (productToEdit) {
+      updateProduct(updatedProduct);
+    } else {
+      addProduct(updatedProduct);
+    }
+
+    router.push("/products");
+  };
+
+
+  // --- Add state for search and filter ---
+const [searchTerm, setSearchTerm] = useState("");
+const [sourceFilter, setSourceFilter] = useState("all-sources");
+
+// --- Derived filtered products ---
+const filteredProducts = products.filter((p) => {
+  const matchesSearch =
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.productId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.sku.toLowerCase().includes(searchTerm.toLowerCase());
+
+  const matchesSource =
+    sourceFilter === "all-sources" || p.source.toLowerCase() === sourceFilter;
+
+  return matchesSearch && matchesSource;
+});
+
+
+
+
+
+
+
+
+  const handleViewVender = (vendorId: number) => {
+    router.push(`/products/vendor-risk/${vendorId}`)
   }
   return (
     <div className="flex h-screen bg-background">
@@ -105,7 +189,7 @@ export default function ProductsPage() {
                 <Download className="h-4 w-4 mr-2" />
                 Export Report
               </Button>
-              <Button>
+              <Button  onClick={handleSave}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Product
               </Button>
@@ -129,11 +213,13 @@ export default function ProductsPage() {
                       <div className="flex-1">
                         <div className="relative">
                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input placeholder="Search products..." className="pl-10" />
+                          <Input placeholder="Search products..." className="pl-10 border border-neutral-300 bg-white" 
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}/>
                         </div>
                       </div>
-                      <Select defaultValue="all-sources">
-                        <SelectTrigger className="w-48">
+                      <Select defaultValue="all-sources" value={sourceFilter} onValueChange={setSourceFilter}>
+                        <SelectTrigger className="w-48 border border-neutral-300 bg-white">
                           <SelectValue placeholder="Source" />
                         </SelectTrigger>
                         <SelectContent>
@@ -142,10 +228,7 @@ export default function ProductsPage() {
                           <SelectItem value="outsourced">Outsourced</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Button variant="outline">
-                        <Filter className="h-4 w-4 mr-2" />
-                        Filters
-                      </Button>
+                      
                     </div>
                   </CardContent>
                 </Card>
@@ -204,7 +287,7 @@ export default function ProductsPage() {
 
                 {/* Product List */}
                 <div className="space-y-4">
-                  {products.map((product) => (
+                  {filteredProducts.map((product) => (
                     <Card key={product.id}>
                       <CardContent className="pt-6">
                         <div className="flex items-start justify-between">
@@ -278,10 +361,10 @@ export default function ProductsPage() {
                           </div>
 
                           <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => handleEditProduct(product.id)}>
+                            <Button variant="outline" size="sm" onClick={() => editProduct(product.id)}>
                               Edit Product
                             </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleViewChain(product.id)}>
+                            <Button variant="outline" size="sm" onClick={() => viewChain(product.id)}>
                               <Eye className="h-4 w-4 mr-1" />
                               View Chain
                             </Button>
@@ -306,124 +389,108 @@ export default function ProductsPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                           <Label htmlFor="product-name">Product Name *</Label>
-                          <Input id="product-name" placeholder="e.g., Premium Cotton T-Shirt" />
+                          <Input id="product-name" placeholder="e.g., Premium Cotton T-Shirt"
+                          className="border border-neutral-300 bg-white"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)} />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="product-id">Product ID *</Label>
-                          <Input id="product-id" placeholder="e.g., PROD-001" />
+                          <Input id="product-id" placeholder="e.g., PROD-001" 
+                          className="border border-neutral-300 bg-white"
+                          value={productCode}
+                          onChange={(e) => setProductCode(e.target.value)}/>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                           <Label htmlFor="article-id">Article ID *</Label>
-                          <Input id="article-id" placeholder="e.g., ART-TSH-001" />
+                          <Input id="article-id" placeholder="e.g., ART-TSH-001" 
+                          className="border border-neutral-300 bg-white"
+                          value={articleId}
+                          onChange={(e) => setArticleId(e.target.value)}/>
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="sku">SKU *</Label>
-                          <Input id="sku" placeholder="e.g., TSH-COTTON-001" />
+                          <Input id="sku" placeholder="e.g., TSH-COTTON-001" 
+                          className="border border-neutral-300 bg-white"
+                          value={sku}
+                          onChange={(e) => setSku(e.target.value)}/>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Source of Production */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Source of Production</h3>
-                      <div className="space-y-4">
-                        <div className="flex items-center space-x-6">
-                          <div className="flex items-center space-x-2">
-                            <input type="radio" id="in-house" name="source" value="in-house" className="text-primary" />
-                            <Label htmlFor="in-house">In-house Production</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="radio"
-                              id="outsourced"
-                              name="source"
-                              value="outsourced"
-                              className="text-primary"
-                            />
-                            <Label htmlFor="outsourced">Outsourced to Vendor</Label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Outsourced Vendor Section */}
-                    <Card className="border-dashed">
-                      <CardHeader>
-                        <CardTitle className="text-base">Outsourced Vendor Details</CardTitle>
-                        <CardDescription>Complete this section if production is outsourced</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
-                            <Label htmlFor="vendor-name">Vendor Name</Label>
-                            <Input id="vendor-name" placeholder="Enter vendor company name" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="vendor-country">Vendor Country</Label>
-                            <Select>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select country" />
+                            <Label>Risk Level *</Label>
+                            <Select value={riskLevel} onValueChange={setRiskLevel}>
+                              <SelectTrigger className="border border-neutral-300 bg-white">
+                                <SelectValue placeholder="Select risk level" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="bangladesh">Bangladesh</SelectItem>
-                                <SelectItem value="vietnam">Vietnam</SelectItem>
-                                <SelectItem value="india">India</SelectItem>
-                                <SelectItem value="china">China</SelectItem>
-                                <SelectItem value="italy">Italy</SelectItem>
+                                <SelectItem value="Low">Low</SelectItem>
+                                <SelectItem value="Medium">Medium</SelectItem>
+                                <SelectItem value="High">High</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
                         </div>
+                    </div>
 
-                        <div className="space-y-3">
-                          <Label>Vendor Processes</Label>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {["Cutting", "Stitching", "Dyeing", "Finishing", "Quality Control", "Packaging"].map(
-                              (process) => (
-                                <div key={process} className="flex items-center space-x-2">
-                                  <Checkbox id={process} />
-                                  <Label htmlFor={process} className="text-sm">
-                                    {process}
-                                  </Label>
-                                </div>
-                              ),
-                            )}
+                    {/* Source of Production */}
+                      <Card>
+                  ``  <CardHeader>
+                      <CardTitle>Production Details</CardTitle>
+                      <CardDescription>Source of production and vendor details</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="space-y-2">
+                        <Label>Source *</Label>
+                        <Select value={source} onValueChange={setSource}>
+                          <SelectTrigger className="border border-neutral-300 bg-white">
+                            <SelectValue placeholder="Select source" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {/* <SelectItem value="In-house">In-house Production</SelectItem> */}
+                            <SelectItem value="Outsourced">Outsourced to Vendor</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+            
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="vendor">Vendor Name</Label>
+                            <Input
+                              id="vendor"
+                              value={vendor}
+                              className="border border-neutral-300 bg-white"
+                              onChange={(e) => setVendor(e.target.value)}
+                              placeholder="e.g., European Knits Ltd."
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Vendor Country</Label>
+                            <Select value={vendorCountry} onValueChange={setVendorCountry}>
+                              <SelectTrigger className="border border-neutral-300 bg-white">
+                                <SelectValue placeholder="Select country" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Italy">Italy</SelectItem>
+                                <SelectItem value="India">India</SelectItem>
+                                <SelectItem value="China">China</SelectItem>
+                                <SelectItem value="Vietnam">Vietnam</SelectItem>
+                                <SelectItem value="Bangladesh">Bangladesh</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
+            
+                    </CardContent>
+                </Card>
 
-                        <div className="space-y-4">
-                          <div className="flex items-center space-x-2">
-                            <Checkbox id="brand-supplied" />
-                            <Label htmlFor="brand-supplied">Brand-Supplied Materials</Label>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                              <Label htmlFor="material-name">Material Name</Label>
-                              <Input id="material-name" placeholder="e.g., Organic Cotton" />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="material-source">Material Source</Label>
-                              <Select>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select source" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="brand">Brand</SelectItem>
-                                  <SelectItem value="external-vendor">External Vendor</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* In-house Production Section */}
-                    <Card className="border-dashed">
+                
+                    {/* <Card className="border-dashed">
                       <CardHeader>
                         <CardTitle className="text-base">In-house Production Details</CardTitle>
                         <CardDescription>Complete this section if production is done in-house</CardDescription>
@@ -465,10 +532,10 @@ export default function ProductsPage() {
                           </Select>
                         </div>
                       </CardContent>
-                    </Card>
+                    </Card> */}
 
                     <div className="flex justify-end pt-4">
-                      <Button>Save Product</Button>
+                      <Button onClick={handleSave}>Save Product</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -526,7 +593,7 @@ export default function ProductsPage() {
                               <Button variant="outline" size="sm">
                                 <ExternalLink className="h-4 w-4" />
                               </Button>
-                              <Button variant="outline" size="sm">
+                              <Button variant="outline" size="sm" onClick={() => handleViewVender(vendor.id)}>
                                 Assess Risk
                               </Button>
                             </div>

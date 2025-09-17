@@ -1,3 +1,4 @@
+"use client"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,6 +13,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, AlertTriangle, CheckCircle, XCircle } from "lucide-react"
 import Link from "next/link"
+import { useParams } from "next/navigation"
+import { useVendors } from "@/Context/vendorContext"
 
 const vendor = {
   id: 1,
@@ -31,6 +34,38 @@ const riskCategories = [
 ]
 
 export default function VendorRiskAssessmentPage() {
+
+    const params = useParams();
+    const { vendors } = useVendors();
+
+    console.log("Params:", params);
+    // console.log("vendor from context:", vendors);
+    const vendorId = Number(params.id);
+    // console.log("vendor ID from URL:", vendorId);
+    const vendor = vendors.find((e) => e.id === vendorId);
+    // console.log("vendor :", vendor);
+
+    if (!vendor) {
+        return (
+            <div className="flex h-screen bg-background">
+                <SidebarNavigation />
+                <main className="flex-1 p-6">
+                    <p className="text-muted-foreground">vendor not found.</p>
+                    <Link href="/products">
+                        <Button className="mt-4">
+                            <ArrowLeft className="h-4 w-4 mr-2" />
+                            Back to Products
+                        </Button>
+                    </Link>
+                </main>
+            </div>
+        );
+    }
+
+
+  
+
+
   return (
     <div className="flex h-screen bg-background">
       <SidebarNavigation />

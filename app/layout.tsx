@@ -7,6 +7,9 @@ import { Suspense } from "react"
 import "./globals.css"
 import { SitesProvider } from "@/Context/siteContext"
 import { EmployeesProvider } from "@/Context/EmployeeContext"
+import { VendorProvider } from "@/Context/vendorContext"
+import { ChainProvider } from "@/Context/chainContext"
+import { ProductProvider } from "@/Context/productContext"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -31,7 +34,13 @@ export default function RootLayout({
            <Suspense fallback={null}>
             <SitesProvider>
                 <EmployeesProvider>
-                  {children}
+                  <VendorProvider>
+                          <ChainProvider>
+                              <ProductProvider>
+                                  {children}
+                              </ProductProvider>
+                          </ChainProvider>
+                  </VendorProvider>
                 </EmployeesProvider>
             </SitesProvider>
             </Suspense>

@@ -90,10 +90,10 @@ export default function SiteDetailPage() {
 
           <div className="mt-6">
             <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="employees">Employees</TabsTrigger>
-                <TabsTrigger value="facilities">Facilities</TabsTrigger>
+                {/* <TabsTrigger value="facilities">Facilities</TabsTrigger> */}
                 <TabsTrigger value="compliance">Compliance</TabsTrigger>
               </TabsList>
 
@@ -217,7 +217,7 @@ export default function SiteDetailPage() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="facilities" className="space-y-6">
+              {/* <TabsContent value="facilities" className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Available Facilities</CardTitle>
@@ -233,7 +233,7 @@ export default function SiteDetailPage() {
                     </div>
                   </CardContent>
                 </Card>
-              </TabsContent>
+              </TabsContent> */}
 
               <TabsContent value="compliance" className="space-y-6">
                 <Card>

@@ -8,79 +8,109 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, MapPin, Factory, Truck, Package } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useChain } from "@/Context/chainContext"
+import { useProducts } from "@/Context/productContext"
 
 export default function ProductChainPage({ params }: { params: { id: string } }) {
   const router = useRouter()
+    const { supplyChainStages, materials } = useChain();
+      const { products } = useProducts();
+
+  const product = products.find((p) => p.id === parseInt(params.id))
+  if (!product) {
+    return (
+      <div className="flex h-screen bg-background">
+        <SidebarNavigation />
+
+        <main className="flex-1 overflow-auto">
+          <div className="p-6">
+            <PageHeader title="Product Not Found" description="The requested product does not exist." />
+            <div className="mt-6">
+              <Card>
+                <CardContent>
+                  <div className="text-center text-muted-foreground">No product data available.</div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
+    
+
+
+
 
   // Mock product data
-  const product = {
-    id: params.id,
-    name: "Organic Cotton T-Shirt",
-    category: "Apparel",
-    productionType: "outsourced",
-  }
+  // const product = {
+  //   id: params.id,
+  //   name: "Organic Cotton T-Shirt",
+  //   category: "Apparel",
+  //   productionType: "outsourced",
+  // }
 
-  const supplyChainStages = [
-    {
-      stage: "Raw Material",
-      location: "Gujarat, India",
-      supplier: "Gujarat Cotton Farms",
-      process: "Cotton Growing",
-      coordinates: { lat: 23.0225, lng: 72.5714 },
-      riskLevel: "low",
-      certifications: ["GOTS", "Organic"],
-    },
-    {
-      stage: "Fiber Processing",
-      location: "Tamil Nadu, India",
-      supplier: "Chennai Textile Mills",
-      process: "Cotton Ginning & Carding",
-      coordinates: { lat: 13.0827, lng: 80.2707 },
-      riskLevel: "medium",
-      certifications: ["OEKO-TEX"],
-    },
-    {
-      stage: "Fabric Production",
-      location: "Dhaka, Bangladesh",
-      supplier: "Dhaka Weaving Co.",
-      process: "Weaving & Knitting",
-      coordinates: { lat: 23.8103, lng: 90.4125 },
-      riskLevel: "high",
-      certifications: ["WRAP"],
-    },
-    {
-      stage: "Dyeing & Finishing",
-      location: "Ho Chi Minh City, Vietnam",
-      supplier: "Vietnam Dye Works",
-      process: "Fabric Dyeing & Treatment",
-      coordinates: { lat: 10.8231, lng: 106.6297 },
-      riskLevel: "medium",
-      certifications: ["ZDHC"],
-    },
-    {
-      stage: "Cut & Sew",
-      location: "Phnom Penh, Cambodia",
-      supplier: "Cambodia Garments Ltd",
-      process: "Pattern Cutting & Sewing",
-      coordinates: { lat: 11.5564, lng: 104.9282 },
-      riskLevel: "high",
-      certifications: ["SA8000"],
-    },
-    {
-      stage: "Final Assembly",
-      location: "Bangkok, Thailand",
-      supplier: "Thai Assembly Co.",
-      process: "Quality Control & Packaging",
-      coordinates: { lat: 13.7563, lng: 100.5018 },
-      riskLevel: "low",
-      certifications: ["ISO 9001"],
-    },
-  ]
+  // const supplyChainStages = [
+  //   {
+  //     stage: "Raw Material",
+  //     location: "Gujarat, India",
+  //     supplier: "Gujarat Cotton Farms",
+  //     process: "Cotton Growing",
+  //     coordinates: { lat: 23.0225, lng: 72.5714 },
+  //     riskLevel: "low",
+  //     certifications: ["GOTS", "Organic"],
+  //   },
+  //   {
+  //     stage: "Fiber Processing",
+  //     location: "Tamil Nadu, India",
+  //     supplier: "Chennai Textile Mills",
+  //     process: "Cotton Ginning & Carding",
+  //     coordinates: { lat: 13.0827, lng: 80.2707 },
+  //     riskLevel: "medium",
+  //     certifications: ["OEKO-TEX"],
+  //   },
+  //   {
+  //     stage: "Fabric Production",
+  //     location: "Dhaka, Bangladesh",
+  //     supplier: "Dhaka Weaving Co.",
+  //     process: "Weaving & Knitting",
+  //     coordinates: { lat: 23.8103, lng: 90.4125 },
+  //     riskLevel: "high",
+  //     certifications: ["WRAP"],
+  //   },
+  //   {
+  //     stage: "Dyeing & Finishing",
+  //     location: "Ho Chi Minh City, Vietnam",
+  //     supplier: "Vietnam Dye Works",
+  //     process: "Fabric Dyeing & Treatment",
+  //     coordinates: { lat: 10.8231, lng: 106.6297 },
+  //     riskLevel: "medium",
+  //     certifications: ["ZDHC"],
+  //   },
+  //   {
+  //     stage: "Cut & Sew",
+  //     location: "Phnom Penh, Cambodia",
+  //     supplier: "Cambodia Garments Ltd",
+  //     process: "Pattern Cutting & Sewing",
+  //     coordinates: { lat: 11.5564, lng: 104.9282 },
+  //     riskLevel: "high",
+  //     certifications: ["SA8000"],
+  //   },
+  //   {
+  //     stage: "Final Assembly",
+  //     location: "Bangkok, Thailand",
+  //     supplier: "Thai Assembly Co.",
+  //     process: "Quality Control & Packaging",
+  //     coordinates: { lat: 13.7563, lng: 100.5018 },
+  //     riskLevel: "low",
+  //     certifications: ["ISO 9001"],
+  //   },
+  // ]
 
-  const materials = [
-    { name: "Organic Cotton", percentage: 95, origin: "India", risk: "low" },
-    { name: "Elastane", percentage: 5, origin: "China", risk: "medium" },
-  ]
+  // const materials = [
+  //   { name: "Organic Cotton", percentage: 95, origin: "India", risk: "low" },
+  //   { name: "Elastane", percentage: 5, origin: "China", risk: "medium" },
+  // ]
 
   return (
     <div className="flex h-screen bg-background">

@@ -1,61 +1,164 @@
+"use client"
+
+import { useState } from "react"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { PageHeader } from "@/components/page-header"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Target, Building, Truck, Globe, CheckCircle } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Plus,
+  Search,
+  Filter,
+  Calendar,
+  Users,
+  BarChart3,
+  Clock,
+  CheckCircle,
+  FileText,
+  Target,
+  Zap,
+} from "lucide-react"
+import Link from "next/link"
 
-const scopeOptions = [
+const activeSurveys = [
   {
-    id: "own-site",
-    title: "Own Site Operations",
-    description: "Focus due diligence on company-owned facilities and direct operations",
-    icon: Building,
-    coverage: ["San Francisco HQ", "Austin Manufacturing Plant", "London Office"],
-    riskLevel: "Low",
-    recommended: true,
+    id: 1,
+    title: "Weekly Pulse Check",
+    category: "Employee Satisfaction",
+    type: "Survey",
+    startDate: "2024-01-15",
+    endDate: "2024-01-22",
+    responses: 245,
+    totalRecipients: 320,
+    successRate: 76.6,
+    status: "Active",
+    questions: 5,
+    avgTime: "2 mins",
   },
   {
-    id: "upstream",
-    title: "Upstream Operations",
-    description: "Include suppliers, vendors, and raw material sources in due diligence scope",
-    icon: Truck,
-    coverage: ["24 Suppliers", "15 Material Sources", "8 Countries"],
-    riskLevel: "Medium",
-    recommended: true,
+    id: 2,
+    title: "Environmental Impact Assessment",
+    category: "Environment",
+    type: "Due Diligence",
+    startDate: "2024-01-10",
+    endDate: "2024-02-10",
+    responses: 89,
+    totalRecipients: 150,
+    successRate: 59.3,
+    status: "Active",
+    questions: 25,
+    avgTime: "15 mins",
   },
   {
-    id: "downstream",
-    title: "Downstream Value Chain",
-    description: "Extend due diligence to distribution, retail partners, and end-of-life management",
-    icon: Globe,
-    coverage: ["8 Distribution Centers", "45 Retail Partners", "12 Countries"],
-    riskLevel: "High",
-    recommended: false,
+    id: 3,
+    title: "Supply Chain Labor Practices",
+    category: "Human Rights",
+    type: "Due Diligence",
+    startDate: "2024-01-05",
+    endDate: "2024-01-25",
+    responses: 156,
+    totalRecipients: 200,
+    successRate: 78.0,
+    status: "Active",
+    questions: 18,
+    avgTime: "12 mins",
+  },
+  {
+    id: 4,
+    title: "Workplace Safety Audit",
+    category: "Labour",
+    type: "Survey",
+    startDate: "2024-01-01",
+    endDate: "2024-01-15",
+    responses: 298,
+    totalRecipients: 350,
+    successRate: 85.1,
+    status: "Completed",
+    questions: 12,
+    avgTime: "8 mins",
   },
 ]
 
-const selectedScope = {
-  sites: [
-    { name: "San Francisco HQ", type: "Headquarters", employees: 245, riskScore: 15 },
-    { name: "Austin Manufacturing Plant", type: "Manufacturing", employees: 892, riskScore: 45 },
-    { name: "London Office", type: "Office", employees: 156, riskScore: 20 },
-  ],
-  departments: [
-    { name: "Engineering", employees: 245, complianceFrameworks: 2 },
-    { name: "Manufacturing", employees: 892, complianceFrameworks: 4 },
-    { name: "Quality Assurance", employees: 156, complianceFrameworks: 2 },
-    { name: "Logistics", employees: 324, complianceFrameworks: 3 },
-  ],
-  suppliers: [
-    { name: "Global Textile Co.", country: "Bangladesh", riskScore: 75, products: 15 },
-    { name: "European Knits Ltd.", country: "Italy", riskScore: 35, products: 8 },
-    { name: "Asian Manufacturing Hub", country: "Vietnam", riskScore: 60, products: 22 },
-  ],
-}
+const templates = [
+  {
+    id: 1,
+    title: "Weekly Pulse Check",
+    description: "Quick weekly check-in with employees to gauge mood and engagement",
+    category: "Employee Satisfaction",
+    questions: 5,
+    estimatedTime: "2 mins",
+    icon: Zap,
+    color: "bg-blue-100 text-blue-800",
+  },
+  {
+    id: 2,
+    title: "Environmental Compliance Audit",
+    description: "Comprehensive assessment of environmental practices and compliance",
+    category: "Environment",
+    questions: 28,
+    estimatedTime: "20 mins",
+    icon: FileText,
+    color: "bg-green-100 text-green-800",
+  },
+  {
+    id: 3,
+    title: "Human Rights Due Diligence",
+    description: "Detailed evaluation of human rights practices across operations",
+    category: "Human Rights",
+    questions: 35,
+    estimatedTime: "25 mins",
+    icon: Target,
+    color: "bg-purple-100 text-purple-800",
+  },
+  {
+    id: 4,
+    title: "Labor Standards Assessment",
+    description: "Assessment of working conditions, wages, and labor practices",
+    category: "Labour",
+    questions: 22,
+    estimatedTime: "15 mins",
+    icon: Users,
+    color: "bg-orange-100 text-orange-800",
+  },
+  {
+    id: 5,
+    title: "Supplier Risk Evaluation",
+    description: "Comprehensive risk assessment for supply chain partners",
+    category: "Supply Chain",
+    questions: 30,
+    estimatedTime: "18 mins",
+    icon: BarChart3,
+    color: "bg-red-100 text-red-800",
+  },
+  {
+    id: 6,
+    title: "Customer Satisfaction Survey",
+    description: "Gather feedback on products, services, and overall experience",
+    category: "Customer Experience",
+    questions: 15,
+    estimatedTime: "10 mins",
+    icon: CheckCircle,
+    color: "bg-teal-100 text-teal-800",
+  },
+]
 
 export default function DueDiligencePage() {
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("All")
+
+  const filteredSurveys = activeSurveys.filter((survey) => {
+    const matchesSearch =
+      survey.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      survey.category.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategory = selectedCategory === "All" || survey.category === selectedCategory
+    return matchesSearch && matchesCategory
+  })
+
+  const categories = ["All", "Employee Satisfaction", "Environment", "Human Rights", "Labour", "Supply Chain"]
+
   return (
     <div className="flex h-screen bg-background">
       <SidebarNavigation />
@@ -63,215 +166,251 @@ export default function DueDiligencePage() {
       <main className="flex-1 overflow-auto">
         <div className="p-6">
           <PageHeader
-            title="Due Diligence Scope"
-            description="Define the boundaries and scope of your due diligence assessment"
+            title="Surveys & Due Diligence"
+            description="Manage surveys and due diligence assessments for compliance monitoring"
           >
-            <Button>
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Confirm Scope
-            </Button>
+            <div className="flex gap-2">
+              <Link href="/due-diligence/create">
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create New
+                </Button>
+              </Link>
+              <Link href="/due-diligence/analytics">
+                <Button variant="outline">
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Analytics
+                </Button>
+              </Link>
+            </div>
           </PageHeader>
 
-          <div className="mt-6 space-y-6">
-            {/* Scope Selection */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Select Due Diligence Scope</CardTitle>
-                <CardDescription>
-                  Choose the operational boundaries for your Corporate Sustainability Due Diligence assessment
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-6">
-                  {scopeOptions.map((option) => {
-                    const Icon = option.icon
-                    return (
-                      <div
-                        key={option.id}
-                        className={`p-6 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                          option.recommended ? "border-primary bg-primary/5" : "border-border"
-                        }`}
-                      >
-                        <div className="flex items-start space-x-4">
-                          <Checkbox id={option.id} defaultChecked={option.recommended} />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <Icon className="h-5 w-5 text-primary" />
-                              <h3 className="font-semibold">{option.title}</h3>
-                              {option.recommended && <Badge className="bg-green-100 text-green-800">Recommended</Badge>}
-                              <Badge
-                                variant={
-                                  option.riskLevel === "High"
-                                    ? "destructive"
-                                    : option.riskLevel === "Medium"
-                                      ? "secondary"
-                                      : "default"
-                                }
-                                className={
-                                  option.riskLevel === "High"
-                                    ? "bg-red-100 text-red-800"
-                                    : option.riskLevel === "Medium"
-                                      ? "bg-yellow-100 text-yellow-800"
-                                      : "bg-green-100 text-green-800"
-                                }
-                              >
-                                {option.riskLevel} Risk
-                              </Badge>
-                            </div>
-                            <p className="text-muted-foreground mb-3">{option.description}</p>
-                            <div className="flex flex-wrap gap-2">
-                              {option.coverage.map((item) => (
-                                <Badge key={item} variant="outline" className="text-xs">
-                                  {item}
-                                </Badge>
-                              ))}
-                            </div>
+          <Tabs defaultValue="active" className="mt-6">
+            <TabsList>
+              <TabsTrigger value="active">Active Surveys</TabsTrigger>
+              <TabsTrigger value="templates">Templates</TabsTrigger>
+              <TabsTrigger value="completed">Completed</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="active" className="space-y-6">
+              {/* Search and Filter */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search surveys and due diligence..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="px-3 py-2 border border-input bg-background rounded-md text-sm"
+                  >
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                  <Button variant="outline" size="sm">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filter
+                  </Button>
+                </div>
+              </div>
+
+              {/* Survey Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredSurveys.map((survey) => (
+                  <Card key={survey.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg mb-1">{survey.title}</CardTitle>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="outline" className="text-xs">
+                              {survey.type}
+                            </Badge>
+                            <Badge
+                              className={`text-xs ${
+                                survey.category === "Environment"
+                                  ? "bg-green-100 text-green-800"
+                                  : survey.category === "Human Rights"
+                                    ? "bg-purple-100 text-purple-800"
+                                    : survey.category === "Labour"
+                                      ? "bg-orange-100 text-orange-800"
+                                      : "bg-blue-100 text-blue-800"
+                              }`}
+                            >
+                              {survey.category}
+                            </Badge>
                           </div>
                         </div>
+                        <Badge
+                          variant={survey.status === "Active" ? "default" : "secondary"}
+                          className={survey.status === "Active" ? "bg-green-100 text-green-800" : ""}
+                        >
+                          {survey.status}
+                        </Badge>
                       </div>
-                    )
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Scope Summary */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Sites in Scope */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building className="h-5 w-5" />
-                    Sites in Scope
-                  </CardTitle>
-                  <CardDescription>Company-owned facilities and locations</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {selectedScope.sites.map((site) => (
-                    <div key={site.name} className="flex items-center justify-between p-3 border rounded">
-                      <div>
-                        <div className="font-medium">{site.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {site.type} • {site.employees} employees
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>{survey.startDate}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                          <span>{survey.avgTime}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <span>
+                            {survey.responses}/{survey.totalRecipients}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                          <span>{survey.successRate}%</span>
                         </div>
                       </div>
-                      <Badge
-                        variant={site.riskScore >= 40 ? "destructive" : site.riskScore >= 25 ? "secondary" : "default"}
-                        className={
-                          site.riskScore >= 40
-                            ? "bg-red-100 text-red-800"
-                            : site.riskScore >= 25
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-green-100 text-green-800"
-                        }
-                      >
-                        {site.riskScore}
-                      </Badge>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
 
-              {/* Departments in Scope */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5" />
-                    Departments in Scope
-                  </CardTitle>
-                  <CardDescription>Organizational units and compliance mapping</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {selectedScope.departments.map((dept) => (
-                    <div key={dept.name} className="flex items-center justify-between p-3 border rounded">
-                      <div>
-                        <div className="font-medium">{dept.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {dept.employees} employees • {dept.complianceFrameworks} frameworks
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Response Rate</span>
+                          <span>{survey.successRate}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-primary h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${survey.successRate}%` }}
+                          ></div>
                         </div>
                       </div>
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
 
-              {/* Suppliers in Scope */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Truck className="h-5 w-5" />
-                    Suppliers in Scope
-                  </CardTitle>
-                  <CardDescription>External vendors and supply chain partners</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {selectedScope.suppliers.map((supplier) => (
-                    <div key={supplier.name} className="flex items-center justify-between p-3 border rounded">
-                      <div>
-                        <div className="font-medium">{supplier.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {supplier.country} • {supplier.products} products
-                        </div>
+                      <div className="flex gap-2 pt-2">
+                        <Link href={`/due-diligence/${survey.id}`} className="flex-1">
+                          <Button variant="outline" size="sm" className="w-full bg-transparent">
+                            View Details
+                          </Button>
+                        </Link>
+                        <Link href={`/due-diligence/${survey.id}/responses`} className="flex-1">
+                          <Button size="sm" className="w-full">
+                            View Responses
+                          </Button>
+                        </Link>
                       </div>
-                      <Badge
-                        variant={
-                          supplier.riskScore >= 70 ? "destructive" : supplier.riskScore >= 40 ? "secondary" : "default"
-                        }
-                        className={
-                          supplier.riskScore >= 70
-                            ? "bg-red-100 text-red-800"
-                            : supplier.riskScore >= 40
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-green-100 text-green-800"
-                        }
-                      >
-                        {supplier.riskScore}
-                      </Badge>
-                    </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="templates" className="space-y-6">
+              <div className="text-center py-4">
+                <h3 className="text-lg font-semibold mb-2">Survey & Due Diligence Templates</h3>
+                <p className="text-muted-foreground">
+                  Choose from pre-built templates to quickly create surveys and assessments
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {templates.map((template) => {
+                  const Icon = template.icon
+                  return (
+                    <Card key={template.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start gap-3">
+                          <div className={`p-2 rounded-lg ${template.color}`}>
+                            <Icon className="h-5 w-5" />
+                          </div>
+                          <div className="flex-1">
+                            <CardTitle className="text-lg mb-1">{template.title}</CardTitle>
+                            <Badge className={`text-xs ${template.color}`}>{template.category}</Badge>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <p className="text-sm text-muted-foreground">{template.description}</p>
+
+                        <div className="flex justify-between text-sm">
+                          <div className="flex items-center gap-1">
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                            <span>{template.questions} questions</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                            <span>{template.estimatedTime}</span>
+                          </div>
+                        </div>
+
+                        <Link href={`/due-diligence/create?template=${template.id}`}>
+                          <Button className="w-full" size="sm">
+                            Use Template
+                          </Button>
+                        </Link>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="completed" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {activeSurveys
+                  .filter((s) => s.status === "Completed")
+                  .map((survey) => (
+                    <Card key={survey.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle className="text-lg mb-1">{survey.title}</CardTitle>
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge variant="outline" className="text-xs">
+                                {survey.type}
+                              </Badge>
+                              <Badge className={`text-xs bg-gray-100 text-gray-800`}>{survey.category}</Badge>
+                            </div>
+                          </div>
+                          <Badge variant="secondary">Completed</Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <span>{survey.endDate}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-muted-foreground" />
+                            <span>{survey.responses} responses</span>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 pt-2">
+                          <Link href={`/due-diligence/${survey.id}/report`} className="flex-1">
+                            <Button variant="outline" size="sm" className="w-full bg-transparent">
+                              View Report
+                            </Button>
+                          </Link>
+                          <Link href={`/due-diligence/${survey.id}/responses`} className="flex-1">
+                            <Button size="sm" className="w-full">
+                              View Responses
+                            </Button>
+                          </Link>
+                        </div>
+                      </CardContent>
+                    </Card>
                   ))}
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Scope Impact Summary */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Due Diligence Impact Summary</CardTitle>
-                <CardDescription>Overview of the selected scope and its implications</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">3</div>
-                    <div className="text-sm text-muted-foreground">Sites Covered</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">1,617</div>
-                    <div className="text-sm text-muted-foreground">Employees in Scope</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">3</div>
-                    <div className="text-sm text-muted-foreground">Supplier Countries</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">45</div>
-                    <div className="text-sm text-muted-foreground">Products Tracked</div>
-                  </div>
-                </div>
-
-                <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-                  <h4 className="font-semibold mb-2">Recommended Next Steps</h4>
-                  <ul className="space-y-1 text-sm text-muted-foreground">
-                    <li>• Conduct risk assessment for all sites and suppliers in scope</li>
-                    <li>• Implement monitoring systems for high-risk suppliers (Bangladesh operations)</li>
-                    <li>• Establish regular audit schedules for manufacturing facilities</li>
-                    <li>• Set up grievance mechanisms for all locations in scope</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>

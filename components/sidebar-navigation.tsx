@@ -22,6 +22,7 @@ import {
   LayoutDashboard,
   Globe,
   Scale,
+  ClipboardCheck,
 } from "lucide-react"
 
 const navigationItems = [
@@ -51,6 +52,8 @@ const navigationItems = [
     items: [
       { name: "Department Mapping", href: "/departments", icon: Shield },
       { name: "Risk Assessment", href: "/risk-assessment", icon: TrendingUp },
+      { name: "Task Management", href: "/task", icon: ClipboardCheck },
+
     ],
   },
   {

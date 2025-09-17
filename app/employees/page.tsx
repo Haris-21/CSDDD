@@ -9,10 +9,11 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { Upload, UserPlus, Download, Users, Search, Filter } from "lucide-react"
-import { useState } from "react";
+import { Upload, UserPlus, Download, Users, Search, Filter, ArrowRight } from "lucide-react"
+import { use, useEffect, useState } from "react";
 import { useEmployees } from "@/Context/EmployeeContext";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 
 const employees = [
@@ -50,7 +51,7 @@ const employees = [
 
 export default function EmployeesPage() {
 
-    const { employees, addEmployee } = useEmployees();
+  const { employees, addEmployee , updateEmployee} = useEmployees();
 
   // Form state
   const [firstName, setFirstName] = useState("");
@@ -63,31 +64,102 @@ export default function EmployeesPage() {
   const [employmentType, setEmploymentType] = useState("");
   const [wage, setWage] = useState("");
 
-  const handleSaveEmployee = () => {
-    if (!firstName || !lastName) return alert("Name is required!");
+  
+const [tab, setTab] = useState("import-options");
+const [selectedEmployee, setSelectedEmployee] = useState(null);
 
-    addEmployee({
-      id: Date.now(),
-      name: `${firstName} ${middleName} ${lastName} `,
-      designation: designation || "Unknown",
-      department: department || "Unknown",
-      workerType: workerType || "Local",
-      employmentType: employmentType || "Permanent",
-      wage: wage || "N/A",
-      site: site || "Unknown",
-    });
+  // const handleSaveEmployee = () => {
+  //   // if (!firstName || !lastName) return alert("Name is required!");
 
-    // Reset form
-    setFirstName("");
-    setMiddleName("");
-    setLastName("");
-    setDesignation("");
-    setDepartment("");
-    setSite("");
-    setWorkerType("");
-    setEmploymentType("");
-    setWage("");
+  //   // addEmployee({
+  //   //   id: Date.now(),
+  //   //   name: `${firstName} ${middleName} ${lastName} `,
+  //   //   designation: designation || "Unknown",
+  //   //   department: department || "Unknown",
+  //   //   workerType: workerType || "Local",
+  //   //   employmentType: employmentType || "Permanent",
+  //   //   wage: wage || "N/A",
+  //   //   site: site || "Unknown",
+  //   // });
+
+  //   // // Reset form
+  //   // setFirstName("");
+  //   // setMiddleName("");
+  //   // setLastName("");
+  //   // setDesignation("");
+  //   // setDepartment("");
+  //   // setSite("");
+  //   // setWorkerType("");
+  //   // setEmploymentType("");
+  //   // setWage("");
+
+  //   if (!firstName || !lastName) return alert("First and Last Name are required!");
+
+  // addEmployee({
+  //   id: selectedEmployee ? selectedEmployee.id : Date.now(),
+  //   firstName,
+  //   middleName,
+  //   lastName,
+  //   designation: designation || "Unknown",
+  //   department: department || "Unknown",
+  //   workerType: workerType || "Local",
+  //   employmentType: employmentType || "Permanent",
+  //   wage: wage || "N/A",
+  //   site: site || "Unknown",
+  // });
+
+  // // reset form
+  // setFirstName("");
+  // setMiddleName("");
+  // setLastName("");
+  // setDesignation("");
+  // setDepartment("");
+  // setSite("");
+  // setWorkerType("");
+  // setEmploymentType("");
+  // setWage("");
+
+  // setSelectedEmployee(null);
+  // setTab("employee-list");
+  // };
+
+
+const router = useRouter();
+
+const handleSaveEmployee = () => {
+  if (!firstName || !lastName) return alert("First and Last Name are required!");
+
+  const employeeData = {
+    id: selectedEmployee ? selectedEmployee.id : Date.now(),
+    name: `${firstName} ${middleName} ${lastName}`.replace(/\s+/g, " ").trim(),
+    designation: designation || "Unknown",
+    department: department || "Unknown",
+    workerType: workerType || "Local",
+    employmentType: employmentType || "Permanent",
+    wage: wage || "N/A",
+    site: site || "Unknown",
   };
+
+  if (selectedEmployee) {
+    updateEmployee(employeeData);
+  } else {
+    addEmployee(employeeData);
+  }
+
+  // Reset form
+  setFirstName("");
+  setMiddleName("");
+  setLastName("");
+  setDesignation("");
+  setDepartment("");
+  setSite("");
+  setWorkerType("");
+  setEmploymentType("");
+  setWage("");
+
+  setSelectedEmployee(null);
+  setTab("employee-list");
+};
 
   // --- add these states at the top of EmployeesPage ---
 const [searchTerm, setSearchTerm] = useState("");
@@ -95,16 +167,34 @@ const [departmentFilter, setDepartmentFilter] = useState("all-departments");
 
 // --- filtered employees derived from employees state ---
 const filteredEmployees = employees.filter((emp) => {
+
   const matchesSearch =
     emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    emp.designation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    emp.department.toLowerCase().includes(searchTerm.toLowerCase());
+    (emp.designation || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (emp.department || "").toLowerCase().includes(searchTerm.toLowerCase());
 
   const matchesDepartment =
-    departmentFilter === "all-departments" || emp.department.toLowerCase() === departmentFilter;
+    departmentFilter === "all-departments" ||
+    (emp.department || "").toLowerCase() === departmentFilter;
 
   return matchesSearch && matchesDepartment;
 });
+
+
+useEffect(() => {
+  if (selectedEmployee) {
+   const parts = selectedEmployee.name.split(" ");
+    setFirstName(parts[0] || "");
+    setMiddleName(parts.length === 3 ? parts[1] : "");
+    setLastName(parts.length === 3 ? parts[2] : parts[1] || "");
+    setDesignation(selectedEmployee.designation || "");
+    setDepartment(selectedEmployee.department || "");
+    setSite(selectedEmployee.site || "");
+    setWorkerType(selectedEmployee.workerType || "");
+    setEmploymentType(selectedEmployee.employmentType || "");
+    setWage(selectedEmployee.wage || "");
+  }
+}, [selectedEmployee]);
 
 
 
@@ -115,306 +205,16 @@ const filteredEmployees = employees.filter((emp) => {
       <main className="flex-1 overflow-auto">
         <div className="p-6">
           <PageHeader
-            title="Employee Management"
+            title="Employee List"
             description="Manage workforce data, onboarding, and employee information"
           >
-            <div className="flex gap-2">
-              <Button variant="outline">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-              <Button onClick={handleSaveEmployee}>
-                <UserPlus className="h-4 w-4 mr-2" />
-                Add Employee
-              </Button>
-            </div>
+
           </PageHeader>
 
           <div className="mt-6">
-            <Tabs defaultValue="import-options" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="import-options">Import Options</TabsTrigger>
-                <TabsTrigger value="employee-form">Add Employee</TabsTrigger>
-                <TabsTrigger value="employee-list">Employee List</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="import-options" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                    <CardHeader className="text-center">
-                      <Upload className="h-12 w-12 mx-auto text-primary mb-4" />
-                      <CardTitle>Upload CSV</CardTitle>
-                      <CardDescription>Import employee data from CSV file</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Button className="w-full">
-                        <Upload className="h-4 w-4 mr-2" />
-                        Choose File
-                      </Button>
-                      <p className="text-xs text-muted-foreground mt-2 text-center">
-                        Supports .csv, .xlsx files up to 10MB
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                    <CardHeader className="text-center">
-                      <UserPlus className="h-12 w-12 mx-auto text-primary mb-4" />
-                      <CardTitle>Manual Entry</CardTitle>
-                      <CardDescription>Add employees one by one using forms</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      {/* <Button value={"employee-form"} className="w-full">
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        Add Employee
-                      </Button> */}
-                      <TabsList className="w-full">
-                          <TabsTrigger value="employee-form" className="w-full bg-primary text-primary-foreground"><UserPlus className="h-4 w-4 mr-2 " /> Add Employee</TabsTrigger>
-                      </TabsList>
-                      <p className="text-xs text-muted-foreground mt-2 text-center">Recommended for small teams</p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                    <CardHeader className="text-center">
-                      <div className="h-12 w-12 mx-auto bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                        <span className="text-primary font-bold">API</span>
-                      </div>
-                      <CardTitle>API Integration</CardTitle>
-                      <CardDescription>Connect with existing HR systems</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Button className="w-full bg-transparent" variant="outline">
-                        Setup API
-                      </Button>
-                      <p className="text-xs text-muted-foreground mt-2 text-center">For enterprise integrations</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="employee-form" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Employee Information</CardTitle>
-                    <CardDescription>Enter comprehensive employee details for compliance tracking</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-8">
-                    {/* Personal Details */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Personal Details</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="title">Title</Label>
-                          <Select>
-                            <SelectTrigger className="border border-neutral-300 bg-white">
-                              <SelectValue placeholder="Select" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="mr">Mr.</SelectItem>
-                              <SelectItem value="ms">Ms.</SelectItem>
-                              <SelectItem value="dr">Dr.</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="first-name">First Name *</Label>
-                          <Input id="first-name" placeholder="Enter first name" className="border border-neutral-300 bg-white" 
-                          value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}/>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="middle-name">Middle Name</Label>
-                          <Input id="middle-name" placeholder="Enter middle name" className="border border-neutral-300 bg-white"
-                          value={middleName}
-                          onChange={(e) => setMiddleName(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="last-name">Last Name *</Label>
-                          <Input id="last-name" placeholder="Enter last name" className="border border-neutral-300 bg-white"
-                           value={lastName}
-                          onChange={(e) => setLastName(e.target.value)}/>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="gender">Gender</Label>
-                          <Select>
-                            <SelectTrigger className="border border-neutral-300 bg-white">
-                              <SelectValue placeholder="Select gender" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="male">Male</SelectItem>
-                              <SelectItem value="female">Female</SelectItem>
-                              <SelectItem value="other">Other</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="age">Age</Label>
-                          <Input id="age" type="number" placeholder="Enter age" className="border border-neutral-300 bg-white"/>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="site">Site *</Label>
-                          <Select onValueChange={(val) => setSite(val)}>
-                            <SelectTrigger className="border border-neutral-300 bg-white">
-                              <SelectValue placeholder="Select site" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="sf-hq">San Francisco HQ</SelectItem>
-                              <SelectItem value="austin-plant">Austin Plant</SelectItem>
-                              <SelectItem value="london-office">London Office</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Work Details */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Work Details</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="designation">Designation *</Label>
-                          <Select  onValueChange={(val) => setDesignation(val)}>
-                            <SelectTrigger className="border border-neutral-300 bg-white">
-                              <SelectValue placeholder="Select designation" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="manager">Manager</SelectItem>
-                              <SelectItem value="senior-developer">Senior Developer</SelectItem>
-                              <SelectItem value="operations-manager">Operations Manager</SelectItem>
-                              <SelectItem value="quality-inspector">Quality Inspector</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="department">Department *</Label>
-                          <Select onValueChange={(val) => setDepartment(val)}>
-                            <SelectTrigger className="border border-neutral-300 bg-white">
-                              <SelectValue placeholder="Select department" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="engineering">Engineering</SelectItem>
-                              <SelectItem value="operations">Operations</SelectItem>
-                              <SelectItem value="quality-assurance">Quality Assurance</SelectItem>
-                              <SelectItem value="hr">Human Resources</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="recruiting-agency">Recruiting Agency</Label>
-                          <Input id="recruiting-agency" placeholder="Enter agency name" className="border border-neutral-300 bg-white"/>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Wage & Benefits */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Wage & Benefits</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="wage-type">Wage Type *</Label>
-                          <Select onValueChange={(val) => setWage(val)}>
-                            <SelectTrigger className="border border-neutral-300 bg-white">
-                              <SelectValue placeholder="Select wage type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="per-piece">Per Piece</SelectItem>
-                              <SelectItem value="per-hour">Per Hour</SelectItem>
-                              <SelectItem value="monthly">Monthly</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="compensation">Compensation Amount *</Label>
-                          <Input id="compensation" placeholder="Enter amount" className="border border-neutral-300 bg-white"/>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="reporting-to">Reporting To</Label>
-                          <Select>
-                            <SelectTrigger className="border border-neutral-300 bg-white">
-                              <SelectValue placeholder="Select manager" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="john-doe">John Doe</SelectItem>
-                              <SelectItem value="jane-smith">Jane Smith</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <Label>Benefits</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          {["Medical", "Retirement", "Bonus", "Other"].map((benefit) => (
-                            <div key={benefit} className="flex items-center space-x-2">
-                              <Checkbox id={benefit} />
-                              <Label htmlFor={benefit} className="text-sm">
-                                {benefit}
-                              </Label>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Employment Details */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Employment Details</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="worker-type">Worker Type *</Label>
-                          <Select onValueChange={(val) => setWorkerType(val)}>
-                            <SelectTrigger className="border border-neutral-300 bg-white">
-                              <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="migrant">Migrant</SelectItem>
-                              <SelectItem value="contractual">Contractual</SelectItem>
-                              <SelectItem value="local">Local</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="employment-type">Employment Type *</Label>
-                          <Select onValueChange={(val) => setEmploymentType(val)}>
-                            <SelectTrigger className="border border-neutral-300 bg-white">
-                              <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="permanent">Permanent</SelectItem>
-                              <SelectItem value="temporary">Temporary</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="work-mode">Mode of Work *</Label>
-                          <Select>
-                            <SelectTrigger className="border border-neutral-300 bg-white">
-                              <SelectValue placeholder="Select mode" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="onsite">Onsite</SelectItem>
-                              <SelectItem value="hybrid">Hybrid</SelectItem>
-                              <SelectItem value="remote">Remote</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end pt-4">
-                      <Button onClick={handleSaveEmployee}>Save Employee</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="employee-list" className="space-y-6">
+          
                 {/* Search and Filter */}
-                <Card>
+                <Card className="mb-6">
                   <CardContent className="pt-6">
                     <div className="flex gap-4">
                       <div className="flex-1">
@@ -449,7 +249,7 @@ const filteredEmployees = employees.filter((emp) => {
                 </Card>
 
                 {/* Employee Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   <Card>
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
@@ -506,13 +306,24 @@ const filteredEmployees = employees.filter((emp) => {
                             <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                               <span className="text-sm font-medium text-primary">
                                 {employee.name
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
+                                    .trim()
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")}
+                                    {`${employee.firstName || ""} ${employee.middleName || ""} ${employee.lastName || ""}`
+                                    .trim()
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")}
                               </span>
                             </div>
                             <div>
-                              <h3 className="font-semibold">{employee.name}</h3>
+                              <h3 className="font-semibold">
+                                {employee.name}
+                                 {`${employee.firstName || ""} ${employee.middleName || ""} ${employee.lastName || ""}`.trim()}
+
+
+                              </h3>
                               <p className="text-sm text-muted-foreground">
                                 {employee.designation} • {employee.department}
                               </p>
@@ -537,11 +348,23 @@ const filteredEmployees = employees.filter((emp) => {
                               <p className="font-medium">{employee.site}</p>
                             </div>
                           </div>
+                          <div className="flex space-x-2">
+                          
+                            <Button  variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedEmployee(employee);
+                                  router.push(`/employees/add`);
+                                }}>
+                              Edit Employee
+                            </Button>
+                          
                           <Link href={`/employees/${employee.id}`}>
                             <Button variant="outline" size="sm">
                               View Details
                             </Button>
                           </Link>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -552,8 +375,15 @@ const filteredEmployees = employees.filter((emp) => {
                   )}
 
                 </div>
-              </TabsContent>
-            </Tabs>
+                <div className="mt-4 flex justify-end">
+                    <Link href="/policies" >
+                            <Button variant="outline" size="sm" className="flex-1 w-full bg-primary text-primary-foreground hover:bg-primary/90 p-5">
+                                Continue to Policy Setup
+                                <ArrowRight className="h-4 w-4 ml-2" />
+                            </Button>
+                      </Link>
+                </div>
+          
           </div>
         </div>
       </main>

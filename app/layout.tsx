@@ -10,6 +10,7 @@ import { EmployeesProvider } from "@/Context/EmployeeContext"
 import { VendorProvider } from "@/Context/vendorContext"
 import { ChainProvider } from "@/Context/chainContext"
 import { ProductProvider } from "@/Context/productContext"
+import { CompanyProvider } from "@/Context/companyContext"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -37,7 +38,9 @@ export default function RootLayout({
                   <VendorProvider>
                           <ChainProvider>
                               <ProductProvider>
+                                <CompanyProvider>
                                   {children}
+                                </CompanyProvider>
                               </ProductProvider>
                           </ChainProvider>
                   </VendorProvider>

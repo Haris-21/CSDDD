@@ -8,10 +8,11 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Users, Shield, AlertTriangle, CheckCircle, Plus } from "lucide-react"
+import { Users, Shield, AlertTriangle, CheckCircle, Plus, ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Progress } from "@/components/ui/progress";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import Link from "next/link";
 
 const departments = [
   {
@@ -119,10 +120,10 @@ export default function DepartmentsPage() {
             title="Department & Compliance Mapping"
             description="Organize employees into departments and map compliance frameworks"
           >
-            <Button>
+            {/* <Button>
               <Plus className="h-4 w-4 mr-2" />
               Add Department
-            </Button>
+            </Button> */}
           </PageHeader>
 
           <div className="mt-6">
@@ -425,6 +426,14 @@ export default function DepartmentsPage() {
                 </div>
               </TabsContent>
             </Tabs>
+          </div>
+            <div className="mt-4 flex justify-end">
+              <Link href="/products" >
+                      <Button variant="outline" size="sm" className="flex-1 w-full bg-primary text-primary-foreground hover:bg-primary/90 p-5">
+                          Continue to Product Setup
+                          <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                </Link>
           </div>
         </div>
       </main>

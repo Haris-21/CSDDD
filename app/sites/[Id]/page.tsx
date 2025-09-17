@@ -93,7 +93,6 @@ export default function SiteDetailPage() {
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="employees">Employees</TabsTrigger>
-                {/* <TabsTrigger value="facilities">Facilities</TabsTrigger> */}
                 <TabsTrigger value="compliance">Compliance</TabsTrigger>
               </TabsList>
 
@@ -111,10 +110,10 @@ export default function SiteDetailPage() {
                         <label className="text-sm font-medium text-muted-foreground">Site Name</label>
                         <p className="text-lg font-semibold">{site.name}</p>
                       </div>
-                      <div>
+                      {/* <div>
                         <label className="text-sm font-medium text-muted-foreground">Type</label>
                         <Badge variant="secondary">{site.type}</Badge>
-                      </div>
+                      </div> */}
                       <div>
                         <label className="text-sm font-medium text-muted-foreground">Address</label>
                         <p className="text-sm flex items-start gap-2">
@@ -175,13 +174,13 @@ export default function SiteDetailPage() {
                     <CardTitle>Departments</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex flex-wrap gap-2">
+                    {/* <div className="flex flex-wrap gap-2">
                       {sitedetail.departments.map((dept) => (
                         <Badge key={dept} variant="outline">
                           {dept}
                         </Badge>
                       ))}
-                    </div>
+                    </div> */}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -217,23 +216,6 @@ export default function SiteDetailPage() {
                 </Card>
               </TabsContent>
 
-              {/* <TabsContent value="facilities" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Available Facilities</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {sitedetail.facilities.map((facility) => (
-                        <div key={facility} className="flex items-center gap-2 p-3 border rounded">
-                          <Building className="h-4 w-4 text-muted-foreground" />
-                          <span>{facility}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent> */}
 
               <TabsContent value="compliance" className="space-y-6">
                 <Card>

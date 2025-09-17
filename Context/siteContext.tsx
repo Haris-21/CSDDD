@@ -35,29 +35,7 @@ export function SitesProvider({ children }: { children: ReactNode }) {
       type: "Headquarters",
       postalcode: "94105",
       province: "California",
-    },
-    {
-      id: 2,
-      name: "Austin Manufacturing Plant",
-      country: "United States",
-      address: "456 Industrial Blvd, Austin, TX 78701",
-      website: "https://austin.acmecorp.com",
-      employees: 892,
-      type: "Manufacturing",
-      postalcode: "78701",
-      province: "Texas",
-    },
-    {
-      id: 3,
-      name: "London Office",
-      country: "United Kingdom",
-      address: "789 Canary Wharf, London E14 5AB",
-      website: "https://london.acmecorp.com",
-      employees: 156,
-      type: "Office",
-      postalcode: "34566",
-      province: "England",
-    },
+    }
   ]);
 
   const addSite = (site: Site) => setSites((prev) => [...prev, site]);

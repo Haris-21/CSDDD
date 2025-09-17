@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Edit, Download, User, Briefcase, DollarSign, Calendar } from "lucide-react"
+import { ArrowLeft, Edit, Download, User, Briefcase, DollarSign, Calendar, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { useEmployees } from "@/Context/EmployeeContext"
 import { use } from "react"
@@ -258,6 +258,7 @@ export default function EmployeeDetailPage() {
                 </Card>
               </TabsContent>
             </Tabs>
+            
           </div>
         </div>
       </main>

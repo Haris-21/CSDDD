@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Plus, MapPin, Globe, Users, Building, SquarePen, Eye } from "lucide-react"
+import { Plus, MapPin, Globe, Users, Building, SquarePen, Eye, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { useSites } from "@/Context/siteContext"
 import useContext from "react"
@@ -113,7 +113,6 @@ export default function SitesPage() {
                             {site.country}
                           </CardDescription>
                         </div>
-                        <Badge variant="secondary">{site.type}</Badge>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -159,6 +158,14 @@ export default function SitesPage() {
                 ))}
               </div>
             )}
+          </div>
+          <div className="mt-4 flex justify-end">
+           <Link href="/employees" >
+                  <Button variant="outline" size="sm" className="flex-1 w-full bg-primary text-primary-foreground hover:bg-primary/90 p-5">
+                    Continue to Employee Setup
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+            </Link>
           </div>
         </div>
       </main>

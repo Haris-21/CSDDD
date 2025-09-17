@@ -15,6 +15,7 @@ export type Employee = {
 type EmployeeContextType = {
   employees: Employee[];
   addEmployee: (employee: Employee) => void;
+  updateEmployee?: (employee: Employee) => void;
 };
 
 const EmployeeContext = createContext<EmployeeContextType | null>(null);
@@ -56,8 +57,14 @@ export function EmployeesProvider({ children }: { children: ReactNode }) {
   const addEmployee = (employee: Employee) =>
     setEmployees((prev) => [...prev, { ...employee, id: Date.now() }]);
 
+  const updateEmployee = (updatedEmployee : Employee) => {
+    setEmployees((prev) =>
+      prev.map((emp) => (emp.id === updatedEmployee.id ? updatedEmployee : emp))
+    );
+  };
+
   return (
-    <EmployeeContext.Provider value={{ employees, addEmployee }}>
+    <EmployeeContext.Provider value={{ employees, addEmployee, updateEmployee }}>
       {children}
     </EmployeeContext.Provider>
   );

@@ -1,4 +1,3 @@
-"use client";
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,90 +9,16 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Save, ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { useCompany } from "@/Context/companyContext"
-import { useEffect, useState } from "react"
 
 export default function CompanyInfoPage() {
-
-  const [form, setForm] = useState({
-    name: "Acme Corporation",
-    website: "https://www.acmecorp.com",
-    address: "123 Business District, Suite 400",
-    country: "us",
-    state: "ca",
-    city: "San Francisco",
-    postalCode: "94105",
-    sector: "textile",
-    type: "buyer",
-    phone: "+1 (415) 555-0123",
-    email: "contact@acmecorp.com",
-    altEmail: "info@acmecorp.com",
-  });
-
-  const { company, saveCompany, updateCompany } = useCompany();
-
-  // state for form fields
-  const [name, setName] = useState("");
-  const [website, setWebsite] = useState("");
-  const [address, setAddress] = useState("");
-  const [country, setCountry] = useState("");
-  const [state, setState] = useState("");
-  const [city, setCity] = useState("");
-  const [postalCode, setPostalCode] = useState("");
-  const [sector, setSector] = useState("");
-  const [type, setType] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [altEmail, setAltEmail] = useState("");
-
-  // prefill when editing
-  useEffect(() => {
-    if (company) {
-      setName(company.name);
-      setWebsite(company.website || "");
-      setAddress(company.address);
-      setCountry(company.country);
-      setState(company.state);
-      setCity(company.city);
-      setPostalCode(company.postalCode);
-      setSector(company.sector);
-      setType(company.type);
-      setPhone(company.phone);
-      setEmail(company.email);
-      setAltEmail(company.altEmail || "");
-    }
-  }, [company]);
-
-  const handleSave = () => {
-    const formData = {
-      name,
-      website,
-      address,
-      country,
-      state,
-      city,
-      postalCode,
-      sector,
-      type,
-      phone,
-      email,
-      altEmail,
-    };
-
-    if (company) {
-      updateCompany(formData); // update existing
-    } else {
-      saveCompany(formData); // first-time save
-    }
-  };
   return (
     <div className="flex h-screen bg-background">
       <SidebarNavigation />
 
       <main className="flex-1 overflow-auto">
         <div className="p-6">
-          <PageHeader title="Company Setup" description="Configure your company profile and contact information">
-            <Button  onClick={handleSave}>
+          <PageHeader title="Vendor Setup" description="Configure your vendor profile and contact information">
+            <Button>
               <Save className="h-4 w-4 mr-2" />
               Save Changes
             </Button>
@@ -102,14 +27,14 @@ export default function CompanyInfoPage() {
           <div className="mt-6">
             <Tabs defaultValue="company-info" className="space-y-6">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="company-info">Company Information</TabsTrigger>
-                <TabsTrigger value="contact-details">Contact Details</TabsTrigger>
+                <TabsTrigger value="company-info">Vendor Information</TabsTrigger>
+                <TabsTrigger value="contact-details">Vendor Details</TabsTrigger>
               </TabsList>
 
               <TabsContent value="company-info" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Company Information</CardTitle>
+                    <CardTitle>Vendor Information</CardTitle>
                     <CardDescription>
                       Basic information about your company that will be used across the platform
                     </CardDescription>
@@ -117,21 +42,18 @@ export default function CompanyInfoPage() {
                   <CardContent className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="company-name">Company Name *</Label>
-                        <Input id="company-name" placeholder="Enter company name" defaultValue="Acme Corporation" className="border border-neutral-300 bg-white"
-                        value={name} onChange={(e) => setName(e.target.value)}
-                        />
+                        <Label htmlFor="company-name">Vendor Name *</Label>
+                        <Input id="company-name" placeholder="Enter Vendor name" defaultValue="Acme Corporation" className="border border-neutral-300 bg-white"/>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="company-website">Company Website</Label>
+                        <Label htmlFor="Vendor-website">Vendor Website</Label>
                         <Input
                           id="company-website"
                           type="url"
                           placeholder="https://www.example.com"
                           defaultValue="https://www.acmecorp.com"
                           className="border border-neutral-300 bg-white"
-                          value={website} onChange={(e) => setWebsite(e.target.value)}
                         />
                       </div>
                     </div>
@@ -144,87 +66,82 @@ export default function CompanyInfoPage() {
                         defaultValue="123 Business District, Suite 400"
                         rows={3}
                         className="border border-neutral-300 outline-none"
-                         value={address} onChange={(e) => setAddress(e.target.value)}
                       />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="country">Country *</Label>
-                        <Select defaultValue="United States"  value={country} onValueChange={(e) => setCountry(e)}>
+                        <Select defaultValue="us" >
                           <SelectTrigger className="border border-neutral-300">
                             <SelectValue placeholder="Select country" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="United States">United States</SelectItem>
-                            <SelectItem value="United Kingdom">United Kingdom</SelectItem>
-                            <SelectItem value="Germany">Germany</SelectItem>
-                            <SelectItem value="France">France</SelectItem>
-                            <SelectItem value="Canada">Canada</SelectItem>
-                            <SelectItem value="Australia">Australia</SelectItem>
-                            <SelectItem value="Japan">Japan</SelectItem>
-                            <SelectItem value="India">India</SelectItem>
+                            <SelectItem value="us">United States</SelectItem>
+                            <SelectItem value="uk">United Kingdom</SelectItem>
+                            <SelectItem value="de">Germany</SelectItem>
+                            <SelectItem value="fr">France</SelectItem>
+                            <SelectItem value="ca">Canada</SelectItem>
+                            <SelectItem value="au">Australia</SelectItem>
+                            <SelectItem value="jp">Japan</SelectItem>
+                            <SelectItem value="in">India</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="state">State/Province *</Label>
-                        <Select defaultValue="California" value={state} onValueChange={(e) => setState(e)}>
+                        <Select defaultValue="ca">
                           <SelectTrigger className="border border-neutral-300">
                             <SelectValue placeholder="Select state" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="California">California</SelectItem>
-                            <SelectItem value="New York">New York</SelectItem>
-                            <SelectItem value="Texas">Texas</SelectItem>
-                            <SelectItem value="Florida">Florida</SelectItem>
-                            <SelectItem value="Illinois">Illinois</SelectItem>
+                            <SelectItem value="ca">California</SelectItem>
+                            <SelectItem value="ny">New York</SelectItem>
+                            <SelectItem value="tx">Texas</SelectItem>
+                            <SelectItem value="fl">Florida</SelectItem>
+                            <SelectItem value="il">Illinois</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="city">City *</Label>
-                        <Input id="city" placeholder="Enter city" defaultValue="San Francisco" className="border border-neutral-300 bg-white"
-                        value={city} onChange={(e) => setCity(e.target.value)}
-                        />
+                        <Input id="city" placeholder="Enter city" defaultValue="San Francisco" className="border border-neutral-300 bg-white"/>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="postal-code">Postal Code *</Label>
-                        <Input id="postal-code" placeholder="Enter postal code" defaultValue="94105" className="border border-neutral-300 bg-white"
-                        value={postalCode}  onChange={(e) => setPostalCode(e.target.value)}
-                        />
+                        <Input id="postal-code" placeholder="Enter postal code" defaultValue="94105" className="border border-neutral-300 bg-white"/>
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="sector">Sector *</Label>
-                        <Select defaultValue="Textile" value={sector} onValueChange={(e) => setSector(e)}>
+                        <Select defaultValue="textile">
                           <SelectTrigger className="border border-neutral-300 bg-white">
                             <SelectValue placeholder="Select sector" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Textile">Textile</SelectItem>
-                            <SelectItem value="Logistics">Logistics</SelectItem>
-                            <SelectItem value="Medicine">Medicine</SelectItem>
-                            <SelectItem value="Automotive">Automotive</SelectItem>
-                            <SelectItem value="Other">Other</SelectItem>
+                            <SelectItem value="textile">Textile</SelectItem>
+                            <SelectItem value="logistics">Logistics</SelectItem>
+                            <SelectItem value="medicine">Medicine</SelectItem>
+                            <SelectItem value="automotive">Automotive</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="company-type">Company Type *</Label>
-                        <Select defaultValue="Buyer/Brand" value={type} onValueChange={(e) => setType(e)}>
+                        <Label htmlFor="company-type">Vendor Type *</Label>
+                        <Select defaultValue="buyer">
                           <SelectTrigger className="border border-neutral-300 bg-white">
                             <SelectValue placeholder="Select type" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Buyer/Brand">Buyer/Brand</SelectItem>
-                            <SelectItem value="Supplier">Supplier</SelectItem>
+                            <SelectItem value="buyer">Buyer/Brand</SelectItem>
+                            <SelectItem value="supplier">Supplier</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -237,31 +154,29 @@ export default function CompanyInfoPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Contact Details</CardTitle>
-                    <CardDescription>Primary contact information for your company</CardDescription>
+                    <CardDescription>Primary contact information for your Vendor</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="company-phone">Company Contact Number *</Label>
+                        <Label htmlFor="company-phone">Vendor Contact Number *</Label>
                         <Input
                           id="company-phone"
                           type="tel"
                           placeholder="+1 (555) 123-4567"
                           defaultValue="+1 (415) 555-0123"
                           className="border border-neutral-300 bg-white"
-                          value={phone}  onChange={(e) => setPhone(e.target.value)}
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="company-email">Company Email *</Label>
+                        <Label htmlFor="company-email">Vendor Email *</Label>
                         <Input
                           id="company-email"
                           type="email"
                           placeholder="contact@company.com"
                           defaultValue="contact@acmecorp.com"
                           className="border border-neutral-300 bg-white"
-                          value={email} onChange={(e) => setEmail(e.target.value)}
                         />
                       </div>
                     </div>
@@ -274,14 +189,13 @@ export default function CompanyInfoPage() {
                         placeholder="alternative@company.com"
                         defaultValue="info@acmecorp.com"
                         className="border border-neutral-300 bg-white"
-                        value={altEmail} onChange={(e) => setAltEmail(e.target.value)}
                       />
                     </div>
 
                     <div className="flex justify-end pt-4">
-                      <Link href="/company/company-detail">
+                      <Link href="/vendor">
                         <Button>
-                          View Company Details
+                          Continue to Vendors 
                           <ArrowRight className="h-4 w-4 ml-2" />
                         </Button>
                       </Link>

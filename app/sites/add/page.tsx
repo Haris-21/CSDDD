@@ -232,9 +232,8 @@ const handleSave = () => {
                       <Label htmlFor="contact-mobile">Mobile Number *</Label>
                       <Input id="contact-mobile" type="tel" placeholder="+1 (555) 123-4567" className="border border-neutral-300 bg-white"/>
                     </div>
-
                     <div className="flex justify-end pt-4">
-                         <Button>{siteToEdit ? "Update Site & Continue" : "Save Site & Continue"}</Button>
+                         <Button onClick={handleSave}>{siteToEdit ? "Update Site & Continue" : "Save Site & Continue"}</Button>
                     </div>
                   </CardContent>
                 </Card>

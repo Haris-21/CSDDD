@@ -31,36 +31,48 @@ const navigationItems = [
     items: [
       { name: "Company Dashboard", href: "/", icon:  LayoutDashboard  },
       { name: "Company Information", href: "/company/info", icon: Building2 },
+      { name: "Company Detail", href: "/company/company-detail", icon: Building2 },
+    
     ],
   },
   {
     title: "Sites Management",
     items: [
-      { name: "Site Dashboard", href: "/sites", icon:  Globe  },
       { name: "Add Site", href: "/sites/add", icon: MapPin },
+      { name: "Site Grid", href: "/sites", icon:  Globe  },
     ],
   },
   {
-    title: "Organization",
+    title: "Employee Onboarding",
     items: [
-      { name: "Employee Onboarding", href: "/employees", icon: Users },
-      { name: "Policies", href: "/policies", icon: Scale },
+      { name: "Add Employee", href: "/employees/add", icon: Users },
+      { name: "Employee List", href: "/employees", icon: Users },
+      { name: "Add Policies", href: "/policies/add", icon: Scale },
+      { name: "Policies List", href: "/policies", icon: Scale },
     ],
   },
-  {
-    title: "Compliance & Risk",
+   {
+    title: "Departments",
     items: [
-      { name: "Department Mapping", href: "/departments", icon: Shield },
-      { name: "Risk Assessment", href: "/risk-assessment", icon: TrendingUp },
-      { name: "Task Management", href: "/task", icon: ClipboardCheck },
-
+      { name: "Departments ", href: "/departments", icon: Shield }
     ],
   },
   {
     title: "Supply Chain",
     items: [
-      { name: "Product Mapping", href: "/products", icon: Package },
+      { name: "Add Product", href: "/products/add", icon: Package },
+      { name: "Product List", href: "/products", icon: Package },
+      { name: "Add Vendor", href: "/vendor/add", icon: Building2 },
+      { name: "Vendor List", href: "/vendor", icon: Building2 },
       { name: "Due Diligence Scope", href: "/due-diligence", icon: Target },
+    ],
+  },
+    {
+    title: "Compliance & Risk",
+    items: [
+      { name: "Risk Assessment", href: "/risk-assessment", icon: TrendingUp },
+      { name: "Task Management", href: "/task", icon: ClipboardCheck },
+
     ],
   },
   {
@@ -79,7 +91,7 @@ export function SidebarNavigation() {
   return (
     <div
       className={cn(
-        "flex flex-col h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300",
+        "flex flex-col h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 ",
         isCollapsed ? "w-16" : "w-64",
       )}
     >
@@ -97,7 +109,7 @@ export function SidebarNavigation() {
       </div>
 
       {/* Navigation */}
-      <ScrollArea className="flex-1 px-3 py-4">
+      <ScrollArea className="flex-1 px-3 py-4 overflow-y-auto">
         <nav className="space-y-6">
           {navigationItems.map((section, index) => (
             <div key={index} className="space-y-2">
@@ -132,6 +144,7 @@ export function SidebarNavigation() {
           ))}
         </nav>
       </ScrollArea>
+      
     </div>
   )
 }

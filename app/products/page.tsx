@@ -273,24 +273,7 @@ const filteredProducts = products.filter((p) => {
                               <Badge variant={product.source === "In-house" ? "default" : "secondary"}>
                                 {product.source}
                               </Badge>
-                              <Badge
-                                variant={
-                                  product.riskLevel === "High"
-                                    ? "destructive"
-                                    : product.riskLevel === "Medium"
-                                      ? "secondary"
-                                      : "default"
-                                }
-                                className={
-                                  product.riskLevel === "High"
-                                    ? "bg-red-100 text-red-800"
-                                    : product.riskLevel === "Medium"
-                                      ? "bg-yellow-100 text-yellow-800"
-                                      : "bg-green-100 text-green-800"
-                                }
-                              >
-                                {product.riskLevel} Risk
-                              </Badge>
+                             
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm mb-4">

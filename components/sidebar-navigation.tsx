@@ -39,7 +39,7 @@ const navigationItems = [
     title: "Sites Management",
     items: [
       { name: "Add Site", href: "/sites/add", icon: MapPin },
-      { name: "Site Grid", href: "/sites", icon:  Globe  },
+      { name: "Site Overview", href: "/sites", icon:  Globe  },
     ],
   },
   {
@@ -47,6 +47,11 @@ const navigationItems = [
     items: [
       { name: "Add Employee", href: "/employees/add", icon: Users },
       { name: "Employee List", href: "/employees", icon: Users },
+    ],
+  },
+   {
+    title: "Define Policies",
+    items: [
       { name: "Add Policies", href: "/policies/add", icon: Scale },
       { name: "Policies List", href: "/policies", icon: Scale },
     ],
@@ -64,7 +69,12 @@ const navigationItems = [
       { name: "Product List", href: "/products", icon: Package },
       { name: "Add Vendor", href: "/vendor/add", icon: Building2 },
       { name: "Vendor List", href: "/vendor", icon: Building2 },
-      { name: "Due Diligence Scope", href: "/due-diligence", icon: Target },
+    ],
+  },
+  {
+    title: "Due Diligence",
+    items: [
+      { name: "Due Diligence", href: "/due-diligence", icon: Target },
     ],
   },
     {

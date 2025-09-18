@@ -73,10 +73,10 @@ export default function VendorRiskAssessmentPage() {
       <main className="flex-1 overflow-auto">
         <div className="p-6">
           <div className="flex items-center gap-4 mb-6">
-            <Link href="/products">
+            <Link href="/vendor">
               <Button variant="outline" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Products
+                Back to Vendor List
               </Button>
             </Link>
           </div>

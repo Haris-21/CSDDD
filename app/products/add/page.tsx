@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Package, Factory, Truck, Search, Filter, Download, ExternalLink, Eye } from "lucide-react"
+import { Plus, Package, Factory, Truck, Search, Filter, Download, ExternalLink, Eye, ArrowRight } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useVendors } from "@/Context/vendorContext";
 import { useChain } from "@/Context/chainContext";
@@ -92,7 +92,7 @@ export default function ProductsPage() {
   const { supplyChainStages, materials } = useChain();
 
 
-    const router = useRouter();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const productId = searchParams.get("id");
 
@@ -108,6 +108,11 @@ export default function ProductsPage() {
   const [vendor, setVendor] = useState("");
   const [vendorCountry, setVendorCountry] = useState("");
   const [riskLevel, setRiskLevel] = useState("");
+  const [selectedProcesses, setSelectedProcesses] = useState<string[]>([]);
+  const [selectedSites, setSelectedSites] = useState<string[]>([]);
+  const [materialsList, setMaterialsList] = useState<string[]>([]);
+  const [materialName, setMaterialName] = useState("");
+  const [materialSource, setMaterialSource] = useState("");
 
   useEffect(() => {
     if (productToEdit) {
@@ -133,8 +138,9 @@ export default function ProductsPage() {
       vendor,
       vendorCountry,
       riskLevel,
-      processes: productToEdit?.processes ?? [],
-      materials: productToEdit?.materials ?? [],
+      processes: selectedProcesses,
+      materials: materialsList,
+      sites: selectedSites, // add this field if you want to keep sites too
     };
 
     if (productToEdit) {
@@ -145,6 +151,18 @@ export default function ProductsPage() {
 
     router.push("/products");
   };
+
+  const toggleProcess = (process: string) => {
+  setSelectedProcesses((prev) =>
+    prev.includes(process) ? prev.filter((p) => p !== process) : [...prev, process]
+  );
+};
+
+const toggleSite = (site: string) => {
+  setSelectedSites((prev) =>
+    prev.includes(site) ? prev.filter((s) => s !== site) : [...prev, site]
+  );
+};
 
 
   // --- Add state for search and filter ---
@@ -234,21 +252,7 @@ const filteredProducts = products.filter((p) => {
                         </div>
                       </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="space-y-2">
-                            <Label>Risk Level *</Label>
-                            <Select value={riskLevel} onValueChange={setRiskLevel}>
-                              <SelectTrigger className="border border-neutral-300 bg-white">
-                                <SelectValue placeholder="Select risk level" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Low">Low</SelectItem>
-                                <SelectItem value="Medium">Medium</SelectItem>
-                                <SelectItem value="High">High</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
+                       
                     </div>
 
                     {/* Source of Production */}
@@ -260,96 +264,182 @@ const filteredProducts = products.filter((p) => {
                     <CardContent className="space-y-6">
                       <div className="space-y-2">
                         <Label>Source *</Label>
-                        <Select value={source} onValueChange={setSource}>
-                          <SelectTrigger className="border border-neutral-300 bg-white">
-                            <SelectValue placeholder="Select source" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="In-house">In-house Production</SelectItem>
-                            <SelectItem value="Outsourced">Outsourced to Vendor</SelectItem>
-                          </SelectContent>
-                        </Select>
+                         <div className="flex items-center space-x-6">
+                                <div className="flex items-center space-x-2">
+                                  <input
+                                    type="radio"
+                                    id="in-house"
+                                    name="source"
+                                    value="In-house"
+                                    checked={source === "In-house"}
+                                    onChange={(e) => setSource(e.target.value)}
+                                    className="text-primary"
+                                  />
+                                  <Label htmlFor="in-house">In-house Production</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <input
+                                    type="radio"
+                                    id="outsourced"
+                                    name="source"
+                                    value="Outsourced"
+                                    checked={source === "Outsourced"}
+                                    onChange={(e) => setSource(e.target.value)}
+                                    className="text-primary"
+                                  />
+                                  <Label htmlFor="outsourced">Outsourced to Vendor</Label>
+                                </div>
+                              </div>
                       </div>
-
-            
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="space-y-2">
-                            <Label htmlFor="vendor">Vendor Name</Label>
-                            <Input
-                              id="vendor"
-                              value={vendor}
-                              className="border border-neutral-300 bg-white"
-                              onChange={(e) => setVendor(e.target.value)}
-                              placeholder="e.g., European Knits Ltd."
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Vendor Country</Label>
-                            <Select value={vendorCountry} onValueChange={setVendorCountry}>
-                              <SelectTrigger className="border border-neutral-300 bg-white">
-                                <SelectValue placeholder="Select country" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Italy">Italy</SelectItem>
-                                <SelectItem value="India">India</SelectItem>
-                                <SelectItem value="China">China</SelectItem>
-                                <SelectItem value="Vietnam">Vietnam</SelectItem>
-                                <SelectItem value="Bangladesh">Bangladesh</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-            
                     </CardContent>
                 </Card>
+               
+                    {/* Outsourced Vendor Details */}
+                    {source === "Outsourced" && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-base">Outsourced Vendor Details</CardTitle>
+                          <CardDescription>
+                            Complete this section if production is outsourced
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                              <Label htmlFor="vendor-name">Vendor Name</Label>
+                              <Input
+                                id="vendor-name"
+                                value={vendor}
+                                onChange={(e) => setVendor(e.target.value)}
+                                placeholder="Enter vendor company name"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="vendor-country">Vendor Country</Label>
+                              <Select value={vendorCountry} onValueChange={setVendorCountry}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select country" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Bangladesh">Bangladesh</SelectItem>
+                                  <SelectItem value="Vietnam">Vietnam</SelectItem>
+                                  <SelectItem value="India">India</SelectItem>
+                                  <SelectItem value="China">China</SelectItem>
+                                  <SelectItem value="Italy">Italy</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          {/* Vendor Processes etc. */}
+                        </CardContent>
+                      </Card>
+                    )}
 
-                
-                    {/* <Card className="border-dashed">
-                      <CardHeader>
-                        <CardTitle className="text-base">In-house Production Details</CardTitle>
-                        <CardDescription>Complete this section if production is done in-house</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        <div className="space-y-3">
-                          <Label>Internal Processes</Label>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {[
-                              "Weaving",
-                              "Knitting",
-                              "Cutting",
-                              "Stitching",
-                              "Dyeing",
-                              "Finishing",
-                              "Quality Check",
-                            ].map((process) => (
-                              <div key={process} className="flex items-center space-x-2">
-                                <Checkbox id={`internal-${process}`} />
-                                <Label htmlFor={`internal-${process}`} className="text-sm">
-                                  {process}
-                                </Label>
+                    {/* In-house Production Details */}
+                    {source === "In-house" && (
+                      <Card >
+                        <CardHeader>
+                          <CardTitle className="text-base">In-house Production Details</CardTitle>
+                          <CardDescription>
+                            Complete this section if production is done in-house
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="space-y-4">
+                          <Label>Mapped Process With Sites</Label>
+                        
+                          <div className="">
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                {/* Sites */}
+                                  {["San Francisco Headquarters","Austin Manufacturing Plant","London Office"].map((site) => (
+                                    <div key={site} className="flex items-center space-x-2">
+                                      <Checkbox
+                                        id={`site-${site}`}
+                                        checked={selectedSites.includes(site)}
+                                        onCheckedChange={() => toggleSite(site)}
+                                      />
+                                      <Label htmlFor={`site-${site}`} className="text-sm">
+                                        {site}
+                                      </Label>
+                                    </div>
+                                  ))}           
                               </div>
-                            ))}
+                        
                           </div>
                         </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="production-site">Production Site</Label>
-                          <Select>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select production site" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="sf-hq">San Francisco HQ</SelectItem>
-                              <SelectItem value="austin-plant">Austin Manufacturing Plant</SelectItem>
-                              <SelectItem value="london-office">London Office</SelectItem>
-                            </SelectContent>
-                          </Select>
+                         <div className="space-y-3">
+                          <Label>Internal Processes</Label>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {/* Processes */}
+                              {["Weaving","Knitting","Cutting","Stitching","Dyeing","Finishing","Quality Check"].map((process) => (
+                                <div key={process} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`process-${process}`}
+                                    checked={selectedProcesses.includes(process)}
+                                    onCheckedChange={() => toggleProcess(process)}
+                                  />
+                                  <Label htmlFor={`process-${process}`} className="text-sm">
+                                    {process}
+                                  </Label>
+                                </div>
+                              ))}
+                          </div>
                         </div>
-                      </CardContent>
-                    </Card> */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                              <Label htmlFor="material-name">Material Name</Label>
+                              <Input     
+                              id="material-name"
+                                  value={materialName}
+                                  onChange={(e) => setMaterialName(e.target.value)}
+                                  placeholder="e.g., Organic Cotton"
+                                  className="border border-neutral-300 bg-white"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="material-source">Material Source</Label>
+                              <Select value={materialSource} onValueChange={setMaterialSource}>
+                                <SelectTrigger className="border border-neutral-300 bg-white">
+                                  <SelectValue placeholder="Select source" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="brand">Brand</SelectItem>
+                                  <SelectItem value="external-vendor">External Vendor</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <Button
+                              variant="outline"
+                              onClick={() => {
+                                if (materialName) {
+                                  setMaterialsList((prev) => [...prev, `${materialName} (${materialSource})`]);
+                                  setMaterialName("");
+                                  setMaterialSource("");
+                                }
+                              }}
+                            >
+                              Add Material
+                            </Button>
 
-                    <div className="flex justify-end pt-4">
-                      <Button onClick={handleSave}>Save Product</Button>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {materialsList.map((mat, idx) => (
+                                <Badge key={idx} variant="secondary">{mat}</Badge>
+                              ))}
+                            </div>
+                      
+                        </CardContent>
+                      </Card>
+                    )}
+
+
+                    <div className="flex justify-end">
+                      <Button onClick={() => {
+                        handleSave(); 
+                        router.push("/vendor/add"); 
+                      }}>Save Product & Add Vendor
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

@@ -428,9 +428,9 @@ export default function DepartmentsPage() {
             </Tabs>
           </div>
             <div className="mt-4 flex justify-end">
-              <Link href="/products" >
+              <Link href="/products/add" >
                       <Button variant="outline" size="sm" className="flex-1 w-full bg-primary text-primary-foreground hover:bg-primary/90 p-5">
-                          Continue to Product Setup
+                          Continue to Product Setup 
                           <ArrowRight className="h-4 w-4 ml-2" />
                       </Button>
                 </Link>

@@ -253,12 +253,12 @@ export default function RiskAssessmentPage() {
 
           <div className="mt-6">
             <Tabs defaultValue="country-sector" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="country-sector">Country & Sector</TabsTrigger>
                 <TabsTrigger value="risk-topics">Risk Topics</TabsTrigger>
                 <TabsTrigger value="severity-calc">Severity Calculation</TabsTrigger>
                 <TabsTrigger value="risk-heatmap">Risk Heatmap</TabsTrigger>
-                <TabsTrigger value="action-plans">Action Plans</TabsTrigger>
+                {/* <TabsTrigger value="action-plans">Action Plans</TabsTrigger> */}
               </TabsList>
 
               <TabsContent value="country-sector" className="space-y-6">
@@ -815,160 +815,7 @@ export default function RiskAssessmentPage() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="action-plans" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Action Plan & Remediation Tracker</CardTitle>
-                    <CardDescription>
-                      Auto-suggested mitigation actions with assignment and progress tracking
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="space-y-4">
-                      {riskSeverityData
-                        .filter((risk) => risk.finalRisk >= 1.5)
-                        .map((risk, index) => (
-                          <div key={index} className="p-4 border rounded-lg space-y-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <AlertTriangle className="h-5 w-5 text-orange-600" />
-                                <div>
-                                  <h4 className="font-semibold">{risk.risk}</h4>
-                                  <p className="text-sm text-muted-foreground">
-                                    Risk Score: {risk.finalRisk.toFixed(1)} | Priority: {index + 1}
-                                  </p>
-                                </div>
-                              </div>
-                              <Badge
-                                variant={risk.finalRisk >= 3 ? "destructive" : "secondary"}
-                                className={
-                                  risk.finalRisk >= 3 ? "bg-red-100 text-red-800" : "bg-yellow-100 text-yellow-800"
-                                }
-                              >
-                                {risk.finalRisk >= 3 ? "High" : "Medium"} Priority
-                              </Badge>
-                            </div>
-
-                            <div className="space-y-3">
-                              <div>
-                                <Label className="text-sm font-medium">Auto-Suggested Actions</Label>
-                                <div className="mt-2 space-y-2">
-                                  {risk.risk === "Child Labor" && (
-                                    <>
-                                      <div className="flex items-center gap-2 text-sm">
-                                        <Checkbox id={`action-${index}-1`} />
-                                        <label htmlFor={`action-${index}-1`}>Implement age verification system</label>
-                                      </div>
-                                      <div className="flex items-center gap-2 text-sm">
-                                        <Checkbox id={`action-${index}-2`} />
-                                        <label htmlFor={`action-${index}-2`}>Conduct supplier audits</label>
-                                      </div>
-                                      <div className="flex items-center gap-2 text-sm">
-                                        <Checkbox id={`action-${index}-3`} />
-                                        <label htmlFor={`action-${index}-3`}>Establish grievance mechanism</label>
-                                      </div>
-                                    </>
-                                  )}
-                                  {risk.risk === "Water Pollution" && (
-                                    <>
-                                      <div className="flex items-center gap-2 text-sm">
-                                        <Checkbox id={`action-${index}-1`} />
-                                        <label htmlFor={`action-${index}-1`}>Install water treatment systems</label>
-                                      </div>
-                                      <div className="flex items-center gap-2 text-sm">
-                                        <Checkbox id={`action-${index}-2`} />
-                                        <label htmlFor={`action-${index}-2`}>Monitor water quality regularly</label>
-                                      </div>
-                                      <div className="flex items-center gap-2 text-sm">
-                                        <Checkbox id={`action-${index}-3`} />
-                                        <label htmlFor={`action-${index}-3`}>Obtain environmental certifications</label>
-                                      </div>
-                                    </>
-                                  )}
-                                  {risk.risk === "Labor Rights" && (
-                                    <>
-                                      <div className="flex items-center gap-2 text-sm">
-                                        <Checkbox id={`action-${index}-1`} />
-                                        <label htmlFor={`action-${index}-1`}>Conduct labor rights training</label>
-                                      </div>
-                                      <div className="flex items-center gap-2 text-sm">
-                                        <Checkbox id={`action-${index}-2`} />
-                                        <label htmlFor={`action-${index}-2`}>Establish worker committees</label>
-                                      </div>
-                                      <div className="flex items-center gap-2 text-sm">
-                                        <Checkbox id={`action-${index}-3`} />
-                                        <label htmlFor={`action-${index}-3`}>Regular compliance audits</label>
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="space-y-2">
-                                  <Label>Assign To</Label>
-                                  <Select>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Select assignee" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="compliance">Compliance Officer</SelectItem>
-                                      <SelectItem value="operations">Operations Manager</SelectItem>
-                                      <SelectItem value="procurement">Procurement Manager</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-
-                                <div className="space-y-2">
-                                  <Label>Due Date</Label>
-                                  <Input type="date" />
-                                </div>
-
-                                <div className="space-y-2">
-                                  <Label>Status</Label>
-                                  <Select defaultValue="pending">
-                                    <SelectTrigger>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="pending">Pending</SelectItem>
-                                      <SelectItem value="in-progress">In Progress</SelectItem>
-                                      <SelectItem value="completed">Completed</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                              </div>
-
-                              <div className="space-y-2">
-                                <Label>Progress</Label>
-                                <div className="flex items-center gap-3">
-                                  <Progress value={25} className="flex-1" />
-                                  <span className="text-sm text-muted-foreground">25%</span>
-                                </div>
-                              </div>
-
-                              <div className="space-y-2">
-                                <Label>Evidence Upload</Label>
-                                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center">
-                                  <p className="text-sm text-muted-foreground">
-                                    Drag and drop files here or click to upload evidence
-                                  </p>
-                                  <Button variant="outline" size="sm" className="mt-2 bg-transparent">
-                                    Choose Files
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-
-                    <div className="flex justify-end pt-4">
-                      <Button>Save Action Plans</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
+       
             </Tabs>
           </div>
         </div>

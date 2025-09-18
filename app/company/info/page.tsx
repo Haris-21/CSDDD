@@ -99,14 +99,8 @@ export default function CompanyInfoPage() {
             </Button>
           </PageHeader>
 
-          <div className="mt-6">
-            <Tabs defaultValue="company-info" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="company-info">Company Information</TabsTrigger>
-                <TabsTrigger value="contact-details">Contact Details</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="company-info" className="space-y-6">
+          <div className="mt-6 space-y-6">  
+             
                 <Card>
                   <CardHeader>
                     <CardTitle>Company Information</CardTitle>
@@ -230,10 +224,7 @@ export default function CompanyInfoPage() {
                       </div>
                     </div>
                   </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="contact-details" className="space-y-6">
+                </Card>         
                 <Card>
                   <CardHeader>
                     <CardTitle>Contact Details</CardTitle>
@@ -288,8 +279,8 @@ export default function CompanyInfoPage() {
                     </div>
                   </CardContent>
                 </Card>
-              </TabsContent>
-            </Tabs>
+              
+         
           </div>
         </div>
       </main>

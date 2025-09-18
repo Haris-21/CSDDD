@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { Upload, UserPlus, Download, Users, Search, Filter } from "lucide-react"
+import { Upload, UserPlus, Download, Users, Search, Filter, ArrowLeft } from "lucide-react"
 import { useEffect, useState } from "react";
 import { useEmployees } from "@/Context/EmployeeContext";
 import Link from "next/link";
@@ -208,14 +208,23 @@ useEffect(() => {
             description="Manage workforce data, onboarding, and employee information"
           >
             <div className="flex gap-2">
+              <Link href={"/sites"}>
               <Button variant="outline">
-                <Download className="h-4 w-4 mr-2" />
-                Export
+                <ArrowLeft />
+                Back to Sites
               </Button>
+              </Link>
+              {
+                tab === "employee-form" ?
+                
+                  <>
               <Button onClick={handleSaveEmployee}>
                 <UserPlus className="h-4 w-4 mr-2" />
                 Add Employee
               </Button>
+                  </> : ""
+                
+              }
             </div>
           </PageHeader>
 
@@ -235,10 +244,19 @@ useEffect(() => {
                       <CardDescription>Import employee data from CSV file</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <Button className="w-full">
-                        <Upload className="h-4 w-4 mr-2" />
-                        Choose File
-                      </Button>
+                      <div className="flex gap-4">
+                        <Button className="flex-1">
+                          <Download className="h-4 w-4 mr-2" />
+                          Download CSV Template
+                        </Button>
+                        <Button className="text-primary-foreground bg-primary flex items-center justify-center text-center relative flex-1">
+                           <Upload />
+                              Choose File
+                              <Input type="file" accept=".csv, .xlsx" title="Choose File" className="text-primary-foreground text-center bg-primary absolute top-0 opacity-0 w-full"  />
+                        </Button>
+                      </div>
+
+                     
                       <p className="text-xs text-muted-foreground mt-2 text-center">
                         Supports .csv, .xlsx files up to 10MB
                       </p>

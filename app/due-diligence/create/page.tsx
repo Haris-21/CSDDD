@@ -100,15 +100,15 @@ export default function CreateSurveyPage() {
       <main className="flex-1 overflow-auto">
         <div className="p-6">
           <PageHeader
-            title="Create Survey / Due Diligence"
-            description="Design and configure a new survey or due diligence assessment"
+            title="Create Due Diligence"
+            description="Design and configure a new due diligence assessment"
           >
             <div className="flex gap-2">
               <Button variant="outline">
                 <Eye className="h-4 w-4 mr-2" />
                 Preview
               </Button>
-              <Button>
+              <Button onClick={() => addQuestion()}>
                 <Save className="h-4 w-4 mr-2" />
                 Save & Deploy
               </Button>
@@ -117,10 +117,9 @@ export default function CreateSurveyPage() {
 
           <Tabs defaultValue="basic" className="mt-6">
             <TabsList>
-              <TabsTrigger value="basic">Basic Info</TabsTrigger>
-              <TabsTrigger value="questions">Questions</TabsTrigger>
-              <TabsTrigger value="targeting">Targeting</TabsTrigger>
-              <TabsTrigger value="schedule">Schedule</TabsTrigger>
+              <TabsTrigger value="basic">Basic Info & Question</TabsTrigger>
+
+              <TabsTrigger value="question-bank">Question Bank</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="space-y-6">
@@ -128,7 +127,7 @@ export default function CreateSurveyPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <FileText className="h-5 w-5" />
-                    Survey Information
+                    Diligence Information
                   </CardTitle>
                   <CardDescription>
                     Configure the basic details of your survey or due diligence assessment
@@ -137,7 +136,7 @@ export default function CreateSurveyPage() {
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="title">Survey Title *</Label>
+                      <Label htmlFor="title">Diligence Title *</Label>
                       <Input
                         id="title"
                         placeholder="Enter survey title"
@@ -196,89 +195,13 @@ export default function CreateSurveyPage() {
                   </div>
                 </CardContent>
               </Card>
+          
+
+             
             </TabsContent>
 
-            <TabsContent value="questions" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Add Question</CardTitle>
-                  <CardDescription>Create questions for your survey or assessment</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="question-text">Question Text *</Label>
-                    <Textarea
-                      id="question-text"
-                      placeholder="Enter your question"
-                      value={currentQuestion.text}
-                      onChange={(e) => setCurrentQuestion((prev) => ({ ...prev, text: e.target.value }))}
-                      rows={2}
-                    />
-                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="question-type">Question Type</Label>
-                      <Select
-                        value={currentQuestion.type}
-                        onValueChange={(value) => setCurrentQuestion((prev) => ({ ...prev, type: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {questionTypes.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              {type.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex items-end">
-                      <Button onClick={addQuestion} className="w-full">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Question
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Questions List */}
-              {surveyData.questions.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Questions ({surveyData.questions.length})</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {surveyData.questions.map((question, index) => (
-                      <div key={question.id} className="flex items-start gap-4 p-4 border rounded-lg">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="font-medium">Q{index + 1}.</span>
-                            <Badge variant="outline" className="text-xs">
-                              {questionTypes.find((t) => t.value === question.type)?.label}
-                            </Badge>
-                          </div>
-                          <p className="text-sm">{question.text}</p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeQuestion(question.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              )}
-            </TabsContent>
-
-            <TabsContent value="targeting" className="space-y-6">
+            <TabsContent value="schedule" className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -384,10 +307,7 @@ export default function CreateSurveyPage() {
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
-
-            <TabsContent value="schedule" className="space-y-6">
-              <Card>
+                <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Calendar className="h-5 w-5" />
@@ -441,6 +361,9 @@ export default function CreateSurveyPage() {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+            <TabsContent value="quesion-bank" className="space-y-6">
+            
             </TabsContent>
           </Tabs>
         </div>

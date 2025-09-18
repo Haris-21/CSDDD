@@ -14,79 +14,36 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, Package, Factory, Truck, Search, Filter, Download, ExternalLink, Eye } from "lucide-react"
 import { useVendors } from "@/Context/vendorContext"
 import { useChain } from "@/Context/chainContext"
+import Link from "next/link"
+import { useState } from "react"
 
-const products = [
-  {
-    id: 1,
-    name: "Premium Cotton T-Shirt",
-    productId: "PROD-001",
-    articleId: "ART-TSH-001",
-    sku: "TSH-COTTON-001",
-    source: "In-house",
-    processes: ["Cutting", "Stitching", "Quality Check"],
-    materials: ["Organic Cotton", "Polyester Thread"],
-    riskLevel: "Low",
-  },
-  {
-    id: 2,
-    name: "Denim Jeans Classic",
-    productId: "PROD-002",
-    articleId: "ART-JNS-002",
-    sku: "JNS-DENIM-002",
-    source: "Outsourced",
-    vendor: "Global Textile Co.",
-    vendorCountry: "Bangladesh",
-    processes: ["Dyeing", "Cutting", "Stitching"],
-    materials: ["Denim Fabric", "Metal Buttons"],
-    riskLevel: "High",
-  },
-  {
-    id: 3,
-    name: "Wool Sweater",
-    productId: "PROD-003",
-    articleId: "ART-SWT-003",
-    sku: "SWT-WOOL-003",
-    source: "Outsourced",
-    vendor: "European Knits Ltd.",
-    vendorCountry: "Italy",
-    processes: ["Knitting", "Finishing"],
-    materials: ["Merino Wool", "Synthetic Blend"],
-    riskLevel: "Medium",
-  },
-]
 
-const vendors = [
-  {
-    id: 1,
-    name: "Global Textile Co.",
-    country: "Bangladesh",
-    processes: ["Dyeing", "Cutting", "Stitching", "Finishing"],
-    productsCount: 15,
-    riskScore: 75,
-  },
-  {
-    id: 2,
-    name: "European Knits Ltd.",
-    country: "Italy",
-    processes: ["Knitting", "Finishing", "Quality Control"],
-    productsCount: 8,
-    riskScore: 35,
-  },
-  {
-    id: 3,
-    name: "Asian Manufacturing Hub",
-    country: "Vietnam",
-    processes: ["Assembly", "Packaging", "Logistics"],
-    productsCount: 22,
-    riskScore: 60,
-  },
-]
+
 
 export default function ProductsPage() {
   const router = useRouter()
 
   const { vendors, addVendor, updateVendor, deleteVendor } = useVendors();
   const { supplyChainStages, materials } = useChain();
+
+    // --- add these states at the top of EmployeesPage ---
+  const [searchTerm, setSearchTerm] = useState("");
+  const [ProcessFilter, setRiskFilter] = useState("All Process");
+  
+  // --- filtered employees derived from employees state ---
+  const filteredVendor = vendors.filter((vend) => {
+  
+    const matchesSearch =
+      vend.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (vend.country || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (vend.processes || "").includes(searchTerm.toLowerCase());
+  
+    const matchesDepartment =
+      ProcessFilter === "All Process" ||
+      (vend.processes || "") === ProcessFilter;
+  
+    return matchesSearch && matchesDepartment;
+  });
 
 
   return (
@@ -103,14 +60,51 @@ export default function ProductsPage() {
           </PageHeader>
 
           <div className="mt-6">
+              <Card className="mb-6">
+                  <CardContent className="pt-6">
+                    <div className="flex gap-4">
+                      <div className="flex-1">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input placeholder="Search employees..." className="pl-10 border border-neutral-300 bg-white w-full" 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <Select defaultValue="All Process"
+                          value={ProcessFilter}
+                          onValueChange={(val) => setRiskFilter(val)}
+                      >
+                        <SelectTrigger className="w-48 border border-neutral-300 bg-white">
+                          <SelectValue placeholder="Processes" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="All Process">All Process</SelectItem>
+                          <SelectItem value="Dyeing">Dyeing</SelectItem>
+                          <SelectItem value="Cutting">Cutting</SelectItem>
+                          <SelectItem value="Stitching">Stitching</SelectItem>
+                          <SelectItem value="Finishing">Finishing</SelectItem>
+                          <SelectItem value="Knitting">Knitting</SelectItem>
+                          <SelectItem value="Quality Control">Quality Control</SelectItem>
+                          <SelectItem value="Assembly">Assembly</SelectItem>
+                          <SelectItem value="Packaging">Packaging</SelectItem>
+                          <SelectItem value="Logistics">Logistics</SelectItem>
+                          <SelectItem value="Packaging">Packaging</SelectItem>
+                          <SelectItem value="Quality Assurance">Quality Assurance</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {/* <Button variant="outline">
+                        <Filter className="h-4 w-4 mr-2" />
+                        Filters
+                      </Button> */}
+                    </div>
+                  </CardContent>
+                </Card>
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Vendor Management</CardTitle>
-                    <CardDescription>Manage and assess vendor relationships and risk profiles</CardDescription>
-                  </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {vendors.map((vendor) => (
+                      {filteredVendor.map((vendor) => (
                         <div key={vendor.id} className="p-4 border rounded-lg">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
@@ -157,7 +151,7 @@ export default function ProductsPage() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => router.push(`/vendor-risk/${vendor.id}`)}
+                                onClick={() => router.push(`/vendor/vendor-risk/${vendor.id}`)}
                               >
                                 Assess Risk
                               </Button>
@@ -168,10 +162,12 @@ export default function ProductsPage() {
                     </div>
 
                     <div className="mt-6">
-                      <Button>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add New Vendor
-                      </Button>
+                      <Link href={"/vendor/add"}>
+                        <Button>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add New Vendor
+                        </Button>
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>

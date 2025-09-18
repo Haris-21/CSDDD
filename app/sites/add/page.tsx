@@ -94,14 +94,7 @@ const handleSave = () => {
             </div>
           </PageHeader>
 
-          <div className="mt-6">
-            <Tabs defaultValue="site-info" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="site-info">Site Information</TabsTrigger>
-                <TabsTrigger value="contact-person">Contact Person</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="site-info" className="space-y-6">
+          <div className="mt-6 space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Site Information</CardTitle>
@@ -182,10 +175,7 @@ const handleSave = () => {
                       </div>
                     </div>
                   </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="contact-person" className="space-y-6">
+                </Card>      
                 <Card>
                   <CardHeader>
                     <CardTitle>Site Contact Person</CardTitle>
@@ -237,8 +227,7 @@ const handleSave = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </TabsContent>
-            </Tabs>
+             
           </div>
         </div>
       </main>
